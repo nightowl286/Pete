@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="Pete.Views.EntryList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             xmlns:vms="clr-namespace:Pete.ViewModels"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Margin="15" Style="{DynamicResource Border.Card}"/>
+        <Grid Margin="30,30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button IsCancel="True" Style="{DynamicResource Button.Asset}" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding OpenDashboardCommand}"/>
+
+            <TextBlock Grid.Column="1" Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Margin="5,0" TextWrapping="NoWrap" ToolTip="{Binding FilterText}" Text="{Binding FilterText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+
+            <TextBlock Style="{DynamicResource TextBlock.Main}" Grid.Column="2" Text="filter by" VerticalAlignment="Center"/>
+            <ComboBox Style="{DynamicResource ComboBox.Category}" Grid.Column="3" Margin="5,0,5,0" ItemsSource="{Binding Categories}" SelectedIndex="{Binding FilterCategoryIndex,Mode=TwoWay}">
+                <ComboBox.Resources>
+                    <DataTemplate DataType="{x:Type vms:CategoryViewModel}">
+                        <TextBlock Style="{DynamicResource TextBlock.ComboBox.Category}"/>
+                    </DataTemplate>
+                </ComboBox.Resources>
+            </ComboBox>
+            <Button Grid.Column="4" Style="{DynamicResource Button.Asset}" Content="{DynamicResource Text.Wrench}" Command="{Binding EditCategoryCommand}" ToolTip="edit category"/>
+            <Button Grid.Column="5" Style="{DynamicResource Button.Trash}" ToolTip="delete category" Command="{Binding DeleteCategoryCommand}"/>
+        </Grid>
+        <ScrollViewer Margin="15,0,15,15" Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Entries}" Focusable="False">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type vms:EntryPreviewViewModel}">
+                        <Button Margin="7,3" Padding="0" Style="{DynamicResource Button.Base}" HorizontalContentAlignment="Stretch" CommandParameter="{Binding ID}"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.ShowEntryCommand}">
+                            <Grid Margin="10,10,10,5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition x:Name="colCategory" Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Title}" ToolTip="{Binding Title}" TextAlignment="Left" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" FontSize="16"/>
+
+                                <Border Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" Margin="5,0,0,5" Background="{DynamicResource Brush.Background}" HorizontalAlignment="Right" CornerRadius="5">
+                                    <Border.Style>
+                                        <Style TargetType="{x:Type Border}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CategoryName}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.IsFiltering}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock MaxWidth="150" Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding CategoryName}" Text="{Binding CategoryName}" TextWrapping="NoWrap" Margin="5,3" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+
+                                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last viewed" Foreground="{DynamicResource Brush.Text.Shade(50)}" Margin="0,0,5,0" FontSize="16" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Eye}" VerticalAlignment="Center"/>
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding ViewDateString}" FontSize="12" Foreground="{DynamicResource Brush.Text.Shade(50)}" Text="{Binding ViewDateDisplay,StringFormat={}{0} ago}" VerticalAlignment="Center"/>
+
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last edited" Margin="15,0,5,0" Foreground="{DynamicResource Brush.Text.Shade(50)}" FontSize="12" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Wrench}" VerticalAlignment="Center"/>
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding EditDateString}" FontSize="12" Text="{Binding EditDateDisplay,StringFormat={}{0} ago}" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.Shade(50)}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

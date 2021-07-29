@@ -1,0 +1,6 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Pete.Resources">
+    <FontFamily x:Key="Font.Main">Fira Sans</FontFamily>
+    <FontFamily x:Key="Font.Assets">Segoe MDL2 Assets</FontFamily>
+</ResourceDictionary>

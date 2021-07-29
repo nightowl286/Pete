@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="Pete.Views.Dialogs.ConfirmRemoveDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border Margin="15" Style="{DynamicResource Border.Card}"/>
+        <Grid Margin="30,30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.ColumnSpan="3" MaxWidth="300" Text="{Binding CustomText}">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CustomText}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TextBlock Grid.ColumnSpan="3" MaxWidth="300">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CustomText}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+                <Run Text="Are you sure you want to remove the"/>
+                <Run Text="{Binding ItemType, Mode=OneWay}"/>
+                <Run Text="{Binding ItemName, Mode=OneWay}" Foreground="{DynamicResource Brush.Accent}"/>
+                <Run Text="?"/>
+            </TextBlock>
+            <TextBlock Grid.ColumnSpan="3" Grid.Row="1" Text="{Binding ExtraText}" FontSize="14" TextWrapping="Wrap" MaxWidth="300" TextAlignment="Center" Foreground="{DynamicResource Brush.Text}" Margin="0,10,0,0">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ExtraText}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" Margin="0,15,0,0">
+                <Button Style="{DynamicResource Button.Base}" IsCancel="True" Content="keep" Margin="7,3" Command="{Binding GotResultCommand}">
+                    <Button.CommandParameter>
+                        <sys:Boolean>false</sys:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Style="{DynamicResource Button.Primary}" Content="remove" Margin="7,3" Command="{Binding GotResultCommand}">
+                    <Button.CommandParameter>
+                        <sys:Boolean>true</sys:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

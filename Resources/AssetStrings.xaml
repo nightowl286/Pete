@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Pete.Resources"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="Text.Usb"></sys:String>
+    <sys:String x:Key="Text.Usb.Connect"></sys:String>
+    <sys:String x:Key="Text.Settings.Solid"></sys:String>
+    <sys:String x:Key="Text.Settings"></sys:String>
+    <sys:String x:Key="Text.Info"></sys:String>
+    <sys:String x:Key="Text.Info.Solid"></sys:String>
+    <sys:String x:Key="Text.List"></sys:String>
+    <sys:String x:Key="Text.List.Solid"></sys:String>
+    <sys:String x:Key="Text.Plus"></sys:String>
+    <sys:String x:Key="Text.Circle.Mask"></sys:String>
+    <sys:String x:Key="Text.Eye"></sys:String>
+    <sys:String x:Key="Text.Pen"></sys:String>
+    <sys:String x:Key="Text.Wrench"></sys:String>
+    <sys:String x:Key="Text.Trash"></sys:String>
+    <sys:String x:Key="Text.Home"></sys:String>
+</ResourceDictionary>

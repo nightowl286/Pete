@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Pete</AssemblyName>
+    <Company>TNO</Company>
+    <Authors>Nightowl</Authors>
+    <ApplicationIcon>iconManager.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
+    <PackageReference Include="TNO.BitUtilities" Version="2.0.10" />
+    <PackageReference Include="TNO.Json" Version="1.0.3" />
+    <PackageReference Include="TNO.Pete.E2fa" Version="1.0.3" />
+    <PackageReference Include="TNO.Pete.E2fa.UsbHasher" Version="1.0.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Resources\Images\logoManagerForeground.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Themes\Generic.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ViewModels\Logs\" />
+  </ItemGroup>
+</Project>
