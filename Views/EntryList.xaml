@@ -38,8 +38,8 @@
             <Button Grid.Column="4" Style="{DynamicResource Button.Asset}" Content="{DynamicResource Text.Wrench}" Command="{Binding EditCategoryCommand}" ToolTip="edit category"/>
             <Button Grid.Column="5" Style="{DynamicResource Button.Trash}" ToolTip="delete category" Command="{Binding DeleteCategoryCommand}"/>
         </Grid>
-        <ScrollViewer Margin="15,0,15,15" Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Entries}" Focusable="False">
+        <ScrollViewer Margin="15,0,15,15" Grid.Row="1" Style="{DynamicResource ScrollViewer}" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Entries}" Focusable="False" FocusVisualStyle="{x:Null}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel Orientation="Vertical"/>
