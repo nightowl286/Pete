@@ -20,6 +20,7 @@ using Prism.Commands;
 using System.Windows.Media;
 using Pete.Views.Dialogs;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace Pete
 {
@@ -36,9 +37,9 @@ namespace Pete
         protected override Window CreateShell()
         {
 
-
             ReloadImages();
             MakeGlobalCommands();
+            Container.Resolve<IActivityLog>();
 
             Container.Resolve<ISettings>().Load();
 
@@ -91,6 +92,10 @@ namespace Pete
             IEncryptionModule encryption = Container.Resolve<IEncryptionModule>();
 
             if (!(encryption as EncryptionModule).LoadDebug()) return false;
+
+            IActivityLog log = Container.Resolve<IActivityLog>();
+            log.LoadEncrypted();
+            log.Log(Models.Logs.LogType.Login);
 
             manager.RequestNavigate(RegionNames.MainRegion, nameof(Dashboard), DebugNavigationCallback);
             return true;

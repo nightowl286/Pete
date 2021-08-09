@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Pete.Models;
+using Pete.Models.Logs;
 using Pete.Views;
 using Pete.Views.Dialogs;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
+using TNO.BitUtilities;
 
 namespace Pete
 {
@@ -85,7 +87,7 @@ namespace Pete
                 unit = "second";
             }
             if (value != 1) unit += "s";
-            return $"{value:n0} {unit}"; 
+            return $"{value:n0} {unit}";
         }
         #endregion
 
@@ -105,18 +107,18 @@ namespace Pete
             service.Show(nameof(ConfirmRemoveDialog), param, callback, nameof(GeneralDialogWindow));
         }
         public static void ConfirmRemove(this IDialogService service, Action<bool> callback, string type, string name) => ConfirmRemove(service, callback, type, name, null);
-        public static void ConfirmRemove(this IDialogService service, Action<bool> callback, string type, string name, string extra) => ConfirmRemove(service, res => callback?.Invoke(res.Result == ButtonResult.Yes), type, name, extra,null);
-        public static void ConfirmRemove(this IDialogService service, Action trueCallback, string type, string name, string extra) => ConfirmRemove(service, res =>
-        { 
-            if (res.Result == ButtonResult.Yes) trueCallback?.Invoke(); },
+        public static void ConfirmRemove(this IDialogService service, Action<bool> callback, string type, string name, string extra) => ConfirmRemove(service, res => callback?.Invoke(res.Result == ButtonResult.Yes), type, name, extra, null);
+        public static void ConfirmRemove(this IDialogService service, Action trueCallback, string type, string name, string extra) => ConfirmRemove(service, res => {
+            if (res.Result == ButtonResult.Yes) trueCallback?.Invoke();
+        },
             type, name, extra, null);
         public static void ConfirmRemove(this IDialogService service, Action trueCallback, string type, string name) => ConfirmRemove(service, trueCallback, type, name, null);
         public static void ConfirmRemove(this IDialogService service, Action<bool> callback, string custom) => ConfirmRemove(service, res => callback?.Invoke(res.Result == ButtonResult.Yes), null, null, null, custom);
         public static void ConfirmRemove(this IDialogService service, Action trueCallback, string custom) => ConfirmRemove(service, res => {
-            if (res.Result == ButtonResult.Yes) trueCallback?.Invoke(); },
+            if (res.Result == ButtonResult.Yes) trueCallback?.Invoke();
+        },
             null, null, null, custom);
         #endregion
-
 
         #region Message Dialog
         public static void Message(this IDialogService service, Action<IDialogResult> result, string title, string message, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons)
@@ -132,7 +134,7 @@ namespace Pete
         public static void Message(this IDialogService service, Action<IDialogResult> result, string title, string message, params ButtonResult[] buttons)
         {
             ButtonInfo[] btns = new ButtonInfo[buttons.Length];
-            for(int i = 0; i < buttons.Length;i++)
+            for (int i = 0; i < buttons.Length; i++)
             {
                 ButtonResult res = buttons[i];
                 ButtonType type = ButtonType.Normal;
@@ -146,12 +148,12 @@ namespace Pete
         }
         public static void Message(this IDialogService service, Action<ButtonResult> result, string title, string message, params ButtonResult[] buttons) =>
             Message(service, (IDialogResult res) => result?.Invoke(res.Result), title, message, buttons);
-        public static void Message(this IDialogService service, Action<ButtonResult> result, string title, string message, ButtonResult defaultResult = ButtonResult.None ,params ButtonInfo[] buttons) =>
+        public static void Message(this IDialogService service, Action<ButtonResult> result, string title, string message, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons) =>
             Message(service, (IDialogResult res) => result?.Invoke(res.Result), title, message, defaultResult, buttons);
         #endregion
 
         #region Input Dialog
-        public static void Input(this IDialogService service, Action<IDialogResult> result, string title, string message,string hint, string input, Func<string,string> validation, bool allowCancel, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons)
+        public static void Input(this IDialogService service, Action<IDialogResult> result, string title, string message, string hint, string input, Func<string, string> validation, bool allowCancel, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons)
         {
             DialogParameters p = new DialogParameters();
             if (message != null) p.Add("message", message);
@@ -159,7 +161,7 @@ namespace Pete
             if (validation != null) p.Add("validation", validation);
             if (hint != null) p.Add("hint", hint);
             if (input != null) p.Add("input", input);
-            
+
             p.Add("default", defaultResult);
             p.Add("buttons", buttons);
             p.Add("allow-cancel", allowCancel);
@@ -200,6 +202,15 @@ namespace Pete
         public static void Input(this IDialogService service, Action<ButtonResult, string> result, string title, string message, string hint, Func<string, string> validation, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons) => Input(service, result, title, message, hint, null, validation, true, defaultResult, buttons);
         public static void Input(this IDialogService service, Action<ButtonResult, string> result, string title, string message, string hint, string input, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons) => Input(service, result, title, message, hint, input, null, true, defaultResult, buttons);
         public static void Input(this IDialogService service, Action<ButtonResult, string> result, string title, string message, string hint, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons) => Input(service, result, title, message, hint, null, null, true, defaultResult, buttons);
+        #endregion
+
+        #region Enum Write
+        public static void WriteLogType(this IAdvancedBitWriter w, LogType type) => w.WriteNum((byte)type, 3);
+        public static void WriteEntryLogType(this IAdvancedBitWriter w, EntryLogType type) => w.WriteNum((byte)type, 2);
+        public static void WriteTamperType(this IAdvancedBitWriter w, TamperType type) => w.WriteNum((byte)type, 1);
+        public static LogType ReadLogType(this IAdvancedBitReader r) => (LogType)(byte)r.ReadNum(3);
+        public static EntryLogType ReadEntryLogType(this IAdvancedBitReader r) => (EntryLogType)(byte)r.ReadNum(2);
+        public static TamperType ReadTamperType(this IAdvancedBitReader r) => (TamperType)(byte)r.ReadNum(1);
         #endregion
 
         #region Other

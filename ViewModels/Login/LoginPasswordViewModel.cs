@@ -23,6 +23,7 @@ namespace Pete.ViewModels.Login
         private string _PasswordError;
         private readonly IRegionManager _RegionManager;
         private readonly IEncryptionModule _Encryption;
+        private readonly IActivityLog _ActivityLog;
         private bool _CanContinue;
         private bool _CanEditPassword = true;
         private readonly Dispatcher _Dispatcher;
@@ -35,10 +36,11 @@ namespace Pete.ViewModels.Login
         public bool CanEditPassword { get => _CanEditPassword; private set => SetProperty(ref _CanEditPassword, value); }
         public bool CanContinue { get => _CanContinue; private set => SetProperty(ref _CanContinue, value); }
         #endregion
-        public LoginPasswordViewModel(IRegionManager regionManager, IEncryptionModule encryption)
+        public LoginPasswordViewModel(IRegionManager regionManager, IEncryptionModule encryption, IActivityLog activityLog)
         {
             _RegionManager = regionManager;
             _Encryption = encryption;
+            _ActivityLog = activityLog;
 
             LoginCommand = new DelegateCommand(Login).ObservesCanExecute(() => CanContinue);
             _Dispatcher = Dispatcher.CurrentDispatcher;
@@ -86,6 +88,10 @@ namespace Pete.ViewModels.Login
         private void GetLoginData(Action<string> updateStatus)
         {
             updateStatus("Get login data");
+
+            _ActivityLog.LoadEncrypted();
+            _ActivityLog.Log(Models.Logs.LogType.Login);
+
             _Dispatcher.Invoke(() => _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(Dashboard), App.DebugNavigationCallback));
         }
         #endregion

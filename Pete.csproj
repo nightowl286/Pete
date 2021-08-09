@@ -9,6 +9,16 @@
     <ApplicationIcon>iconManager.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="PreviewImages\**" />
+    <EmbeddedResource Remove="PreviewImages\**" />
+    <None Remove="PreviewImages\**" />
+    <Page Remove="PreviewImages\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove=".gitattributes" />
+    <None Remove=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
     <PackageReference Include="TNO.BitUtilities" Version="2.0.10" />
     <PackageReference Include="TNO.Json" Version="1.0.3" />

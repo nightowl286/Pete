@@ -31,6 +31,7 @@ namespace Pete.ViewModels.Registration
         private string _StatusText = TEXT_DEFAULT;
         private readonly IEncryptionModule _EncryptionModule;
         private readonly IRegionManager _RegionManager;
+        private readonly IActivityLog _ActivityLog;
         private readonly Dispatcher _Dispatcher;
         private string _Target = nameof(Dashboard);
         private Action<Action<string>> _TargetMethod;
@@ -44,12 +45,15 @@ namespace Pete.ViewModels.Registration
         public bool UsbHadError { get => _UsbHadError; private set => _Dispatcher.Invoke(() => SetProperty(ref _UsbHadError, value)); }
         public string StatusText { get => _StatusText; private set => _Dispatcher.Invoke(() => SetProperty(ref _StatusText, value)); }
         #endregion
-        public RegistrationUsbViewModel(IEncryptionModule encryptionModule, IRegionManager regionManager)
+        public RegistrationUsbViewModel(IEncryptionModule encryptionModule, IRegionManager regionManager, IActivityLog activityLog)
         {
             _TargetMethod = GenerateNecessaryData; 
             _EncryptionModule = encryptionModule;
             _RegionManager = regionManager;
+            _ActivityLog = activityLog;
+
             _Dispatcher = Dispatcher.CurrentDispatcher;
+
             Task.Run(ListenForUsb);
         }
 
@@ -137,6 +141,10 @@ namespace Pete.ViewModels.Registration
             if (storedKey)
             {
                 Debug.WriteLine($"[Registration] key successfully stored on 2fa device.");
+
+                _ActivityLog.LoadEncrypted();
+                _ActivityLog.Log(Models.Logs.LogType.Register);
+
                 _Dispatcher.Invoke(() => _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(Dashboard), App.DebugNavigationCallback));
             }
             else

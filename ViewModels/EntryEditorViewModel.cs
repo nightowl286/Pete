@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Pete.Models;
+using Pete.Models.Logs;
 using Pete.Services.Interfaces;
 using Pete.Views.Dialogs;
 using Prism.Commands;
@@ -21,6 +22,7 @@ namespace Pete.ViewModels
     {
         #region Consts
         private const string DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
+        private const int LAST_LOG_AMOUNT = 5;
         #endregion
 
         #region Private
@@ -32,18 +34,13 @@ namespace Pete.ViewModels
         private bool _IsInEditMode;
         private bool _CanDelete = true;
         private ObservableCollection<CategoryViewModel> _Categories;
+        private ObservableCollection<EntryLog> _LastLogs;
         private int _SelectedCategoryIndex;
         private int _LastSelectedCategoryIndex;
         #region Dates
         private DateTime? _CreateDate;
         private DateTime? _ViewDate;
         private DateTime? _EditDate;
-        private string _CreateDateDisplay = "???";
-        private string _ViewDateDisplay = "???";
-        private string _EditDateDisplay = "???";
-        private string _CreateDateString = "???";
-        private string _ViewDateString = "???";
-        private string _EditDateString = "???";
         private DateTime _OpenDate;
         #endregion
         #region Commands
@@ -71,15 +68,9 @@ namespace Pete.ViewModels
         public ReadOnlyObservableCollection<CategoryViewModel> Categories => new ReadOnlyObservableCollection<CategoryViewModel>(_Categories);
         public int SelectedCategoryIndex { get => _SelectedCategoryIndex; set => SetProperty(ref _SelectedCategoryIndex, value); }
         #region Dates
-        public DateTime? CreateDate { get => _CreateDate; private set => SetProperty(ref _CreateDate, value, CreateDateChanged); }
-        public DateTime? ViewDate { get => _ViewDate; private set => SetProperty(ref _ViewDate, value, ViewDateChanged); }
-        public DateTime? EditDate { get => _EditDate; private set => SetProperty(ref _EditDate, value, EditDateChanged); }
-        public string CreateDateDisplay { get => _CreateDateDisplay; private set => SetProperty(ref _CreateDateDisplay, value); }
-        public string ViewDateDisplay { get => _ViewDateDisplay; private set => SetProperty(ref _ViewDateDisplay, value); }
-        public string EditDateDisplay { get => _EditDateDisplay; private set => SetProperty(ref _EditDateDisplay, value); }
-        public string CreateDateString { get => _CreateDateString; private set => SetProperty(ref _CreateDateString, value); }
-        public string ViewDateString { get => _ViewDateString; private set => SetProperty(ref _ViewDateString, value); }
-        public string EditDateString { get => _EditDateString; private set => SetProperty(ref _EditDateString, value); }
+        public DateTime? CreateDate { get => _CreateDate; private set => SetProperty(ref _CreateDate, value); }
+        public DateTime? ViewDate { get => _ViewDate; private set => SetProperty(ref _ViewDate, value); }
+        public DateTime? EditDate { get => _EditDate; private set => SetProperty(ref _EditDate, value); }
         #endregion
         #region Commands
         public DelegateCommand StartEditCommand { get => _StartEditCommand; private set => SetProperty(ref _StartEditCommand, value); }
@@ -201,52 +192,11 @@ namespace Pete.ViewModels
 
 
             EditDate = _OpenDate = _ActivityLog.Log(_EntryId, EntryLogType.Edit);
-            ViewDateChanged();
-            CreateDateChanged();
         }
         private void DeleteEntryConfirmation()
         {
             _EntryStore.RemoveEntry(_EntryId);
             GoBackCommand.Execute();
-        }
-        private void CreateDateChanged()
-        {
-            if (CreateDate.HasValue)
-            {
-                CreateDateDisplay = _OpenDate.Subtract(CreateDate.Value).BiggestUnit();
-                CreateDateString = CreateDate.Value.ToLocalTime().ToString(DATE_FORMAT);
-            }
-            else
-            {
-                CreateDateDisplay = "???";
-                CreateDateString = "???";
-            }
-        }
-        private void ViewDateChanged()
-        {
-            if (ViewDate.HasValue)
-            {
-                ViewDateDisplay = _OpenDate.Subtract(ViewDate.Value).BiggestUnit();
-                ViewDateString = ViewDate.Value.ToLocalTime().ToString(DATE_FORMAT);
-            }
-            else
-            {
-                ViewDateDisplay = "???";
-                ViewDateString = "???";
-            }
-        }
-        private void EditDateChanged()
-        {
-            if (EditDate.HasValue)
-            {
-                EditDateDisplay = _OpenDate.Subtract(EditDate.Value).BiggestUnit();
-                EditDateString = EditDate.Value.ToLocalTime().ToString(DATE_FORMAT);
-            }
-            else
-            {
-                EditDateDisplay = "???";
-                EditDateString = "???";
-            }
         }
         #endregion
 

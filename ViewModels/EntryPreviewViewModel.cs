@@ -21,10 +21,6 @@ namespace Pete.ViewModels
         #region Dates
         private DateTime? _ViewDate;
         private DateTime? _EditDate;
-        private string _ViewDateString = "???";
-        private string _EditDateString = "???";
-        private string _ViewDateDisplay = "???";
-        private string _EditDateDisplay = "???";
         private DateTime _OpenDate;
         #endregion
         #endregion
@@ -35,12 +31,8 @@ namespace Pete.ViewModels
         public CategoryViewModel Category { get => _Category; private set => SetProperty(ref _Category, value); }
         public string CategoryName { get => _CategoryName; private set => SetProperty(ref _CategoryName, value); }
         #region Dates
-        public DateTime? ViewDate { get => _ViewDate; private set => SetProperty(ref _ViewDate, value, ViewDateChanged); }
-        public DateTime? EditDate { get => _EditDate; private set => SetProperty(ref _EditDate, value, EditDateChanged); }
-        public string ViewDateString { get => _ViewDateString; private set => SetProperty(ref _ViewDateString, value); }
-        public string EditDateString { get => _EditDateString; private set => SetProperty(ref _EditDateString, value); }
-        public string ViewDateDisplay { get => _ViewDateDisplay; private set => SetProperty(ref _ViewDateDisplay, value); }
-        public string EditDateDisplay { get => _EditDateDisplay; private set => SetProperty(ref _EditDateDisplay, value); }
+        public DateTime? ViewDate { get => _ViewDate; private set => SetProperty(ref _ViewDate, value); }
+        public DateTime? EditDate { get => _EditDate; private set => SetProperty(ref _EditDate, value); }
         #endregion
         #endregion
         public EntryPreviewViewModel(uint id, string title, CategoryViewModel category, DateTime? viewDate, DateTime? editDate)
@@ -70,32 +62,6 @@ namespace Pete.ViewModels
         }
 
         #region Events
-        private void ViewDateChanged()
-        {
-            if (ViewDate.HasValue)
-            {
-                ViewDateDisplay = _OpenDate.Subtract(ViewDate.Value).BiggestUnit();
-                ViewDateString = ViewDate.Value.ToLocalTime().ToString(DATE_FORMAT);
-            }
-            else
-            {
-                ViewDateDisplay = "???";
-                ViewDateString = "???";
-            }
-        }
-        private void EditDateChanged()
-        {
-            if (EditDate.HasValue)
-            {
-                EditDateDisplay = _OpenDate.Subtract(EditDate.Value).BiggestUnit();
-                EditDateString = EditDate.Value.ToLocalTime().ToString(DATE_FORMAT);
-            }
-            else
-            {
-                EditDateDisplay = "???";
-                EditDateString = "???";
-            }
-        }
         private void CategoryStore_CategoryRemoved(uint id)
         {
             Category = null;

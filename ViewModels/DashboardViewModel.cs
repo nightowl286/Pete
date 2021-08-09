@@ -9,6 +9,7 @@ using Prism.Regions;
 using Pete.Models;
 using Pete.Views;
 using Prism.Services.Dialogs;
+using System.ComponentModel;
 
 namespace Pete.ViewModels
 {
@@ -20,6 +21,7 @@ namespace Pete.ViewModels
         private readonly IEntryStore _EntryStore;
         private readonly IDialogService _DialogService;
         private readonly ICategoryStore _CategoryStore;
+        private readonly IActivityLog _ActivityLog;
         private DelegateCommand _AddNewCommand;
         private DelegateCommand _ShowAllCommand;
         private DelegateCommand _LoadedCommand;
@@ -31,10 +33,11 @@ namespace Pete.ViewModels
         public DelegateCommand ShowAllCommand { get => _ShowAllCommand; private set => SetProperty(ref _ShowAllCommand, value); }
         public DelegateCommand LoadedCommand { get => _LoadedCommand; private set => SetProperty(ref _LoadedCommand, value); }
         #endregion
-        public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore)
+        public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore, IActivityLog activityLog)
         {
             ActivityWarning = false;
 
+            _ActivityLog = activityLog;
             _EntryStore = entryStore;
             _RegionManager = regionManager;
             _DialogService = dialogService;
@@ -44,7 +47,18 @@ namespace Pete.ViewModels
             ShowAllCommand = new DelegateCommand(() => NavigateTo(nameof(EntryList)));
 
             LoadedCommand = new DelegateCommand(CheckMissingCategories);
+
+            activityLog.PropertyChanged += ActivityLog_PropertyChanged;
         }
+        ~DashboardViewModel() => _ActivityLog.PropertyChanged -= ActivityLog_PropertyChanged;
+
+        #region Events
+        private void ActivityLog_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IActivityLog))
+                ActivityWarning = _ActivityLog.HasUnseenWarning;
+        }
+        #endregion
 
         #region Methods
         private void CheckMissingCategories()

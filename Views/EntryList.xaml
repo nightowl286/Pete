@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
              xmlns:vms="clr-namespace:Pete.ViewModels"
-             prism:ViewModelLocator.AutoWireViewModel="True">
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:res="clr-namespace:Pete.Resources">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -38,7 +39,7 @@
             <Button Grid.Column="4" Style="{DynamicResource Button.Asset}" Content="{DynamicResource Text.Wrench}" Command="{Binding EditCategoryCommand}" ToolTip="edit category"/>
             <Button Grid.Column="5" Style="{DynamicResource Button.Trash}" ToolTip="delete category" Command="{Binding DeleteCategoryCommand}"/>
         </Grid>
-        <ScrollViewer Margin="15,0,15,15" Grid.Row="1" Style="{DynamicResource ScrollViewer}" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <ScrollViewer CanContentScroll="True" Margin="15,0,15,15" Grid.Row="1" Style="{DynamicResource ScrollViewer}" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Entries}" Focusable="False" FocusVisualStyle="{x:Null}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -79,10 +80,10 @@
 
                                 <StackPanel Grid.Row="1" Orientation="Horizontal">
                                     <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last viewed" Foreground="{DynamicResource Brush.Text.Shade(50)}" Margin="0,0,5,0" FontSize="16" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Eye}" VerticalAlignment="Center"/>
-                                    <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding ViewDateString}" FontSize="12" Foreground="{DynamicResource Brush.Text.Shade(50)}" Text="{Binding ViewDateDisplay,StringFormat={}{0} ago}" VerticalAlignment="Center"/>
+                                    <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Postfix=" ago" Date="{Binding ViewDate}" FontSize="12" Foreground="{DynamicResource Brush.Text.Shade(50)}" VerticalAlignment="Center"/>
 
                                     <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last edited" Margin="15,0,5,0" Foreground="{DynamicResource Brush.Text.Shade(50)}" FontSize="12" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Wrench}" VerticalAlignment="Center"/>
-                                    <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding EditDateString}" FontSize="12" Text="{Binding EditDateDisplay,StringFormat={}{0} ago}" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.Shade(50)}"/>
+                                    <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Postfix=" ago" Date="{Binding EditDate}" FontSize="12" Foreground="{DynamicResource Brush.Text.Shade(50)}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Grid>
                         </Button>

@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:Pete"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:vms="clr-namespace:Pete.ViewModels"
-             prism:ViewModelLocator.AutoWireViewModel="True">
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:res="clr-namespace:Pete.Resources">
     <UserControl.InputBindings>
         <KeyBinding Command="{Binding DeleteEntryCommand}" Key="Delete"/>
     </UserControl.InputBindings>
@@ -68,15 +69,16 @@
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal" Margin="2.5,5">
                         <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last viewed" Margin="0,0,10,0" FontSize="26" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Eye}" VerticalAlignment="Center"/>
-                        <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding ViewDateString}" Text="{Binding ViewDateDisplay,StringFormat={}{0} ago}" VerticalAlignment="Center"/>
+                        <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Date="{Binding ViewDate}" VerticalAlignment="Center" Postfix=" ago"/>
+                        
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="2.5,5">
                         <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last edited" Margin="0,0,10,0" FontSize="26" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Wrench}" VerticalAlignment="Center"/>
-                        <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding EditDateString}" Text="{Binding EditDateDisplay,StringFormat={}{0} ago}" VerticalAlignment="Center"/>
+                        <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Date="{Binding EditDate}" VerticalAlignment="Center" Postfix=" ago"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="2,5.5">
                         <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="first created" Margin="0,0,10,0" FontSize="26" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Pen}" VerticalAlignment="Center"/>
-                        <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="{Binding CreateDateString}" Text="{Binding CreateDateDisplay,StringFormat={}{0} ago}" VerticalAlignment="Center"/>
+                        <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Date="{Binding CreateDate}" VerticalAlignment="Center" Postfix="ago"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>

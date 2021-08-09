@@ -42,6 +42,7 @@ namespace Pete.ViewModels.Login
         private Dispatcher _Dispatcher;
         private readonly IEncryptionModule _Encryption;
         private readonly IRegionManager _RegionManager;
+        private readonly IActivityLog _ActivityLog;
         private DelegateCommand _GoBackCommand;
         private DelegateCommand _ContinueCommand;
         private string _DeviceID;
@@ -66,12 +67,13 @@ namespace Pete.ViewModels.Login
         public string IDError { get => _IDError; private set => SetProperty(ref _IDError, value); }
         public string HashError { get => _HashError; private set => SetProperty(ref _HashError, value); }
         #endregion
-        public LoginLostUsbViewModel(IRegionManager manager, IEncryptionModule encryption)
+        public LoginLostUsbViewModel(IRegionManager manager, IEncryptionModule encryption, IActivityLog activityLog)
         {
             _Dispatcher = Dispatcher.CurrentDispatcher;
 
             _RegionManager = manager;
             _Encryption = encryption;
+            _ActivityLog = activityLog;
 
             ContinueCommand = new DelegateCommand(ContinueCallback, CanContinue).ObservesProperty(() => DeviceID).ObservesProperty(() => IDError).ObservesProperty(() => DeviceHash).ObservesProperty(() => HashError).ObservesProperty(() => UsbValid);
 
@@ -126,6 +128,9 @@ namespace Pete.ViewModels.Login
 
             updateStatus("deriving encryption key");
             _Encryption.LoadAesKey();
+
+            _ActivityLog.LoadEncrypted();
+            _ActivityLog.Log(Models.Logs.LogType.Login);
 
             _Dispatcher.Invoke(() => _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(Dashboard), App.DebugNavigationCallback));
         }
