@@ -7,6 +7,7 @@ using System.IO;
 using TNO.BitUtilities;
 using System.Text;
 using System.Linq;
+using Pete.Models;
 
 namespace Pete.Services
 {
@@ -44,6 +45,26 @@ namespace Pete.Services
         }
 
         #region Methods
+        public void LogDeletion(uint id, string name, string category)
+        {
+            EntryDeletedLog log = new EntryDeletedLog(DateTime.UtcNow, name, category);
+            InvalidateEntryLogs(id);
+            AddLog(log);
+        }
+        public void InvalidateEntryLogs(uint entryId)
+        {
+            if (_EntryLogs.ContainsKey(entryId))
+                _EntryLogs.Remove(entryId);
+
+            foreach(LogBase log in _AllLogs)
+            {
+                if (log is EntryLog entryLog)
+                {
+                    if (entryLog.EntryId == entryId)
+                        entryLog.EntryId = null;
+                }
+            }
+        }
         private LogBase ReadLog(IAdvancedBitReader r)
         {
             LogType type = r.ReadLogType();
@@ -58,7 +79,10 @@ namespace Pete.Services
                     string category = r.ReadBool() ? r.ReadString(Encoding.UTF8) : null;
                     return new EntryDeletedLog(date, name, category);
                 }
-                uint entryId = r.Read<uint>();
+                uint? entryId = null;
+                if (r.ReadBool()) entryId = r.Read<uint>();
+
+
                 return new EntryLog(entryType, date, entryId);
             }
 
@@ -72,7 +96,7 @@ namespace Pete.Services
                 _LastCleanup = log.Date;
             else if (log.Type == LogType.Register)
                 _HasRegistrationLog = true;
-            else if (log is EntryLog entryLog)
+            else if (log is EntryLog entryLog && entryLog.EntryId.HasValue)
                 AddEntryLog(entryLog);
         }
         private void Load()
@@ -187,13 +211,13 @@ namespace Pete.Services
         }
         private void AddEntryLog(EntryLog log)
         {
-            if (_EntryLogs.TryGetValue(log.EntryId, out List<EntryLog> list))
+            if (_EntryLogs.TryGetValue(log.EntryId.Value, out List<EntryLog> list))
                 list.Add(log);
             else
             {
                 List<EntryLog> logs = new List<EntryLog> { log };
 
-                _EntryLogs.Add(log.EntryId, logs);
+                _EntryLogs.Add(log.EntryId.Value, logs);
             }
         }
         private void AddLog(LogBase log)

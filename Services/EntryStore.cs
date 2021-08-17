@@ -166,6 +166,11 @@ namespace Pete.Services
         public void RemoveEntry(uint id)
         {
             CheckID(id);
+
+            EntryInfo entry = _Entries[id];
+            string category = entry.Category == null ? null : _CategoryStore.GetCategory(entry.Category.Value).Name;
+            _ActivityLog.LogDeletion(id, entry.Title, category);
+
             _Entries.Remove(id);
             _IDManager.Free(id);
             SaveEntries();

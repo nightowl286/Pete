@@ -17,4 +17,5 @@
     <sys:String x:Key="Text.Wrench"></sys:String>
     <sys:String x:Key="Text.Trash"></sys:String>
     <sys:String x:Key="Text.Home"></sys:String>
+    <sys:String x:Key="Text.Arrow.Left"></sys:String>
 </ResourceDictionary>

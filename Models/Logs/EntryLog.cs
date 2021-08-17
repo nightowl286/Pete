@@ -9,9 +9,9 @@ namespace Pete.Models.Logs
     {
         #region Fields
         public EntryLogType EntryType;
-        public uint EntryId;
+        public uint? EntryId;
         #endregion
-        public EntryLog(EntryLogType entryType, DateTime date, uint entryId) : base(LogType.Entry, date)
+        public EntryLog(EntryLogType entryType, DateTime date, uint? entryId) : base(LogType.Entry, date)
         {
             EntryId = entryId;
             EntryType = entryType;
@@ -22,7 +22,8 @@ namespace Pete.Models.Logs
         {
             base.Save(w);
             w.WriteEntryLogType(EntryType);
-            w.Write(EntryId);
+            w.WriteBool(EntryId.HasValue);
+            if (EntryId.HasValue) w.Write(EntryId.Value);
         }
         #endregion
     }

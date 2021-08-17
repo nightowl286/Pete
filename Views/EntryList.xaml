@@ -49,11 +49,11 @@
             <Button Grid.Column="5" Style="{DynamicResource Button.Trash}" ToolTip="delete category" Command="{Binding DeleteCategoryCommand}"/>
         </Grid>
         </Grid>
-        <ScrollViewer CanContentScroll="True" Margin="15,0,15,15" Grid.Row="1" Style="{DynamicResource ScrollViewer}" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Margin="15,0,15,15" Grid.Row="1" Style="{DynamicResource ScrollViewer}" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Entries}" Focusable="False" FocusVisualStyle="{x:Null}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical"/>
+                        <StackPanel Orientation="Vertical"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>

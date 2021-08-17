@@ -34,7 +34,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ShowAllCommand}" Grid.Row="0" Grid.Column="0" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ShowAllCommand}" Grid.Row="0" Grid.Column="0" Margin="15" Padding="0,15,0,10">
             <Button.RenderTransform>
                 <TranslateTransform X="-100" Y="-100"/>
             </Button.RenderTransform>
@@ -50,7 +50,7 @@
                 </Grid>
             </Viewbox>
         </Button>
-        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding AddNewCommand}" Grid.Row="0" Grid.Column="1" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding AddNewCommand}" Grid.Row="0" Grid.Column="1" Margin="15" Padding="0,15,0,10">
             <Button.RenderTransform>
                 <TranslateTransform X="100" Y="-100"/>
             </Button.RenderTransform>
@@ -66,7 +66,7 @@
                 </Grid>
             </Viewbox>
         </Button>
-        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="0" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ActivityLogCommand}" Grid.Row="1" Grid.Column="0" Margin="15" Padding="0,15,0,10">
             <Button.RenderTransform>
                 <TranslateTransform X="-100" Y="100"/>
             </Button.RenderTransform>
@@ -122,7 +122,7 @@
                 </Grid>
             </Viewbox>
         </Button>
-        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="1" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="1" Margin="15" Padding="0,15,0,10">
             <Button.RenderTransform>
                 <TranslateTransform X="100" Y="100"/>
             </Button.RenderTransform>

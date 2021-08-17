@@ -144,9 +144,16 @@ namespace Pete.ViewModels
         {
             ButtonInfo keepEditing = new ButtonInfo(ButtonType.Primary, "keep editing", ButtonResult.No);
             if (_ReservedToken == null)
+            {
                 _DialogService.Message(CancelEditResult, "cancel edit?",
                     "are you sure you want to cancel your edit? any changes will be reverted.", ButtonResult.No,
                     new ButtonInfo(ButtonType.Normal, "cancel edit", ButtonResult.Yes), keepEditing);
+            }
+            else if (string.IsNullOrWhiteSpace(Title) && string.IsNullOrWhiteSpace(Data))
+            {
+                _EntryStore.FreeToken(_ReservedToken);
+                GoBackCommand?.Execute();
+            }
             else
                 _DialogService.Message(CancelEditResult, "remove new entry?",
                     "are you sure you want to cancel editing this new entry? this will also remove it.", ButtonResult.No,
@@ -203,6 +210,8 @@ namespace Pete.ViewModels
         private void DeleteEntryConfirmation()
         {
             _EntryStore.RemoveEntry(_EntryId);
+
+
             GoBackCommand.Execute();
         }
         #endregion

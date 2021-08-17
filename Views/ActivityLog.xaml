@@ -10,16 +10,59 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Margin="15" Style="{DynamicResource Border.Card}"/>
-        <Grid Margin="30,30">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Button IsCancel="{Binding FromDashboard}" Style="{DynamicResource Button.Asset}" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding ShowDashboardCommand}"/>
+        <Grid>
+            <Grid.RenderTransform>
+                <TranslateTransform Y="-200"/>
+            </Grid.RenderTransform>
+            <Grid.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.35" DecelerationRatio="0.2"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Grid.Triggers>
+            <Border Margin="15" Style="{DynamicResource Border.Card}"/>
+            <Grid Margin="30,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button ToolTip="go back" Content="{DynamicResource Text.Arrow.Left}" Command="{Binding GoBackCommand}">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Button.Asset}">
+                            <Setter Property="IsCancel" Value="True"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FromDashboard}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Setter Property="IsCancel" Value="False"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button IsCancel="{Binding FromDashboard}" Style="{DynamicResource Button.Asset}" Grid.Column="1" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding ShowDashboardCommand}"/>
+                <Grid Grid.Column="2">
+                    <Grid.Style>
+                        <Style TargetType="{x:Type Grid}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsShowingFromEntry}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="1" Style="{DynamicResource CheckBox.Main}" Content="show invalidated"/>
+                </Grid>
+            </Grid>
         </Grid>
-        <ScrollViewer Grid.Row="1">
-            
+        <ScrollViewer Focusable="False" Style="{DynamicResource ScrollViewer}" Grid.Row="1" Margin="15,0,15,15" VerticalScrollBarVisibility="Auto">
         </ScrollViewer>
     </Grid>
 </UserControl>

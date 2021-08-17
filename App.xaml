@@ -16,6 +16,7 @@
                     <Color x:Key="Color.Accent.Tint(5)">#0c9090</Color>
                     <Color x:Key="Color.Accent.Tint(10)">#198686</Color>
                     <Color x:Key="Color.Accent.Tint(12.5)">#1f9999</Color>
+                    <Color x:Key="Color.Accent.Tint(17)">#2b9e9e</Color>
                     <Color x:Key="Color.Accent.Tint(20)">#339393</Color>
                     <Color x:Key="Color.Accent.Tint(30)">#4cadad</Color>
                     <Color x:Key="Color.Background">#171717</Color>
@@ -52,6 +53,7 @@
                     <SolidColorBrush x:Key="Brush.Background.Tint(8.2)" Color="{DynamicResource Color.Background.Tint(8.2)}"/>
                     <SolidColorBrush x:Key="Brush.Background.Tint(12.5)" Color="{DynamicResource Color.Background.Tint(12.5)}"/>
                     <SolidColorBrush x:Key="Brush.Background.Tint(17)" Color="{DynamicResource Color.Background.Tint(17)}"/>
+                    <SolidColorBrush x:Key="Brush.Background.Tint(22.5)" Color="{DynamicResource Color.Background.Tint(22.5)}"/>
                     <SolidColorBrush x:Key="Brush.Background.Tint(30)" Color="{DynamicResource Color.Background.Tint(30)}"/>
                     <SolidColorBrush x:Key="Brush.Text" Color="{DynamicResource Color.Text}"/>
                     <SolidColorBrush x:Key="Brush.Text.Tint(100)" Color="{DynamicResource Color.Text.Tint(100)}"/>
@@ -71,6 +73,7 @@
                     <SolidColorBrush x:Key="Brush.Accent.Tint(5)" Color="{DynamicResource Color.Accent.Tint(5)}"/>
                     <SolidColorBrush x:Key="Brush.Accent.Tint(10)" Color="{DynamicResource Color.Accent.Tint(10)}"/>
                     <SolidColorBrush x:Key="Brush.Accent.Tint(12.5)" Color="{DynamicResource Color.Accent.Tint(12.5)}"/>
+                    <SolidColorBrush x:Key="Brush.Accent.Tint(17)" Color="{DynamicResource Color.Accent.Tint(17)}"/>
                     <SolidColorBrush x:Key="Brush.Accent.Tint(20)" Color="{DynamicResource Color.Accent.Tint(20)}"/>
                     <SolidColorBrush x:Key="Brush.Accent.Tint(30)" Color="{DynamicResource Color.Accent.Tint(30)}"/>
                     <SolidColorBrush x:Key="Brush.Accent.Shade" Color="{DynamicResource Color.Accent.Shade}"/>
@@ -163,6 +166,7 @@
                 <ResourceDictionary Source="Resources/TextBlocks.xaml"/>
                 <ResourceDictionary Source="Resources/TextBoxes.xaml"/>
                 <ResourceDictionary Source="Resources/ComboBoxes.xaml"/>
+                <ResourceDictionary Source="Resources/CheckBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

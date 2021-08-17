@@ -25,6 +25,7 @@ namespace Pete.ViewModels
         private DelegateCommand _AddNewCommand;
         private DelegateCommand _ShowAllCommand;
         private DelegateCommand _LoadedCommand;
+        private DelegateCommand _ActivityLogCommand;
         #endregion
 
         #region Properties
@@ -32,6 +33,7 @@ namespace Pete.ViewModels
         public DelegateCommand AddNewCommand { get => _AddNewCommand; private set => SetProperty(ref _AddNewCommand, value); }
         public DelegateCommand ShowAllCommand { get => _ShowAllCommand; private set => SetProperty(ref _ShowAllCommand, value); }
         public DelegateCommand LoadedCommand { get => _LoadedCommand; private set => SetProperty(ref _LoadedCommand, value); }
+        public DelegateCommand ActivityLogCommand { get => _ActivityLogCommand; private set => SetProperty(ref _ActivityLogCommand, value); }
         #endregion
         public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore, IActivityLog activityLog)
         {
@@ -45,6 +47,7 @@ namespace Pete.ViewModels
 
             AddNewCommand = new DelegateCommand(AddNewCallback);
             ShowAllCommand = new DelegateCommand(() => NavigateTo(nameof(EntryList)));
+            ActivityLogCommand = new DelegateCommand(() => NavigateTo(nameof(ActivityLog)));
 
             LoadedCommand = new DelegateCommand(CheckMissingCategories);
 

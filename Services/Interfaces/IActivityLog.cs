@@ -17,6 +17,8 @@ namespace Pete.Services.Interfaces
         #endregion
 
         #region Methods
+        void LogDeletion(uint id, string name, string category);
+        void InvalidateEntryLogs(uint entryId);
         void LoadEncrypted();
         void LogFailedLogin();
         void SeenWarnings();

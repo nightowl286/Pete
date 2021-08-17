@@ -1,0 +1,92 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <Style x:Key="CheckBox.Main" TargetType="{x:Type CheckBox}">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Main}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Main}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.Background.Tint(8.2)}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Background.Tint(3.88)}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Grid VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="Outline" Width="22" HorizontalAlignment="Center" VerticalAlignment="Center" Height="22" Background="Transparent" BorderBrush="{TemplateBinding Background}" BorderThickness="2" CornerRadius="5" Effect="{DynamicResource SmallShadow}"/>
+                        <Path Visibility="Collapsed" Width="14" Height="14" x:Name="CheckMark" SnapsToDevicePixels="False" StrokeThickness="3" Data="M 2 5 L 5 13 L 13 0" Stroke="{TemplateBinding BorderBrush}" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat"/>
+                        <Border Visibility="Collapsed" x:Name="ThreeMark" Background="{TemplateBinding BorderBrush}" Width="10" Height="10" CornerRadius="2"/>
+                        <ContentPresenter Margin="6,0,0,0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" RecognizesAccessKey="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            <Setter Property="Background" Value="{DynamicResource Brush.Accent}"/>
+                            <Setter TargetName="Outline" Property="Background" Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Setter TargetName="Outline" Property="BorderThickness" Value="0"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked" Value="{x:Null}"/>
+                                <Condition Property="IsThreeState" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="ThreeMark" Property="Visibility" Value="Visible"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent}"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.Background.Tint(17)}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tint(50)}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Background.Tint(22.5)}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tint(100)}"/>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True"/>
+                    <Condition Property="IsMouseOver" Value="True"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Brush.Accent.Tint(12.5)}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Background.Tint(3.88)}"/>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True"/>
+                    <Condition Property="IsPressed" Value="True"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource Brush.Accent.Tint(20)}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Background.Tint(3.88)}"/>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="{x:Null}"/>
+                    <Condition Property="IsThreeState" Value="True"/>
+                    <Condition Property="IsMouseOver" Value="True"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent.Tint(12.5)}"/>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="{x:Null}"/>
+                    <Condition Property="IsThreeState" Value="True"/>
+                    <Condition Property="IsPressed" Value="True"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent.Tint(20)}"/>
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

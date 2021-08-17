@@ -165,7 +165,7 @@
                         <ItemsControl ItemsSource="{Binding LastLogs}" Grid.Row="1" Focusable="False" FocusVisualStyle="{x:Null}" Margin="0,0,0,3">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Vertical"/>
+                                <StackPanel Orientation="Vertical"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                             <ItemsControl.Resources>
@@ -178,7 +178,7 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Margin="5,3" Style="{DynamicResource TextBlock.Icon}" FontSize="16" Text="{Binding Icon}"/>
-                                            <res:TimeDisplay Margin="0,2" Grid.Column="1" 
+                                            <res:TimeDisplay Margin="0,2,5,0" Grid.Column="1" 
                                                              Style="{DynamicResource TimeDisplay}" Date="{Binding Date}"/>
                                         </Grid>
                                     </Grid>
