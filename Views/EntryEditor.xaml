@@ -6,8 +6,12 @@
              xmlns:local="clr-namespace:Pete"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:vms="clr-namespace:Pete.ViewModels"
+             xmlns:modelLogs="clr-namespace:Pete.Models.Logs"
+             xmlns:vmslog="clr-namespace:Pete.ViewModels.Logs"
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:res="clr-namespace:Pete.Resources">
+    <UserControl.Resources>
+    </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Command="{Binding DeleteEntryCommand}" Key="Delete"/>
     </UserControl.InputBindings>
@@ -27,6 +31,9 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <local:TextboxHint Hint="entry title" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" TabIndex="0" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Error="{Binding TitleError}">
+                <local:TextboxHint.RenderTransform>
+                    <TranslateTransform Y="-70"/>
+                </local:TextboxHint.RenderTransform>
                 <local:TextboxHint.Style>
                     <Style TargetType="{x:Type local:TextboxHint}">
                         <Setter Property="IsReadOnly" Value="False"/>
@@ -34,11 +41,21 @@
                             <DataTrigger Binding="{Binding IsInEditMode}" Value="False">
                                 <Setter Property="IsReadOnly" Value="True"/>
                             </DataTrigger>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(FrameworkElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.25" DecelerationRatio="0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
                         </Style.Triggers>
                     </Style>
                 </local:TextboxHint.Style>
             </local:TextboxHint>
             <ComboBox Style="{DynamicResource ComboBox.Category}" Grid.Column="1" TabIndex="1" Margin="10,0,0,0" IsEnabled="{Binding IsInEditMode}" ItemsSource="{Binding Categories}" SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}">
+                <ComboBox.RenderTransform>
+                    <TranslateTransform Y="-70"/>
+                </ComboBox.RenderTransform>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <prism:InvokeCommandAction Command="{Binding ComboBoxSelection}"/>
@@ -49,8 +66,17 @@
                         <TextBlock Style="{DynamicResource TextBlock.ComboBox.Category}"/>
                     </DataTemplate>
                 </ComboBox.Resources>
+                <ComboBox.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(FrameworkElement.RenderTransform).(TranslateTransform.Y)" To="0" BeginTime="0:0:0.15" Duration="0:0:0.25" DecelerationRatio="0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </ComboBox.Triggers>
             </ComboBox>
-            <TextBox TabIndex="2" Text="{Binding Data}" Grid.Row="1" CaretBrush="{DynamicResource Brush.Text}" TextWrapping="Wrap" Padding="5" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="5,10" AcceptsReturn="True" IsReadOnlyCaretVisible="False">
+            <TextBox TabIndex="2" Text="{Binding Data}" Grid.Row="1" CaretBrush="{DynamicResource Brush.Text}" TextWrapping="Wrap" Padding="5" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="5,10" AcceptsReturn="True" IsReadOnlyCaretVisible="False" Opacity="0">
                 <TextBox.Style>
                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBox.Editor}">
                         <Setter Property="IsReadOnly" Value="False"/>
@@ -59,30 +85,126 @@
                                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Shade(25)}"/>
                                 <Setter Property="IsReadOnly" Value="True"/>
                             </DataTrigger>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(TextBox.Opacity)" From="0" To="1" BeginTime="0:0:0.25" Duration="0:0:0.35" DecelerationRatio="0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
                         </Style.Triggers>
                     </Style>
                 </TextBox.Style>
             </TextBox>
-            
-            <Border Grid.Column="3" Grid.RowSpan="4" Margin="5,0" Style="{DynamicResource Border.Card}"/>
-            <Grid Margin="15,10" Grid.Column="3" Grid.RowSpan="4">
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal" Margin="2.5,5">
-                        <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last viewed" Margin="0,0,10,0" FontSize="26" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Eye}" VerticalAlignment="Center"/>
-                        <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Date="{Binding ViewDate}" VerticalAlignment="Center" Postfix=" ago"/>
+            <Grid Grid.Column="3" Grid.RowSpan="4" MinWidth="100">
+                <Grid.RenderTransform>
+                    <TranslateTransform X="200"/>
+                </Grid.RenderTransform>
+                <Grid.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.25" BeginTime="0:0:0.25" DecelerationRatio="0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Grid.Triggers>
+                <Border Margin="5,0" Style="{DynamicResource Border.Card}"/>
+                <Grid Margin="15,10">
+                    <Grid.Resources>
+                        <Style x:Key="TextBlock.Icon" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
+                            <Setter Property="Margin" Value="2.5,5,10,5"/>
+                            <Setter Property="FontSize" Value="26"/>
+                            <Setter Property="FontFamily" Value="{DynamicResource Font.Assets}"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                        <Style x:Key="TimeDisplay" TargetType="{x:Type res:TimeDisplay}" BasedOn="{StaticResource TextBlock.Main}">
+                            <Setter Property="TextAlignment" Value="Left"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Postfix" Value=" ago"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{DynamicResource TextBlock.Icon}" ToolTip="last viewed" Text="{DynamicResource Text.Eye}"/>
+                    <TextBlock Style="{DynamicResource TextBlock.Icon}" Grid.Row="1"  ToolTip="last edited" Text="{DynamicResource Text.Wrench}"/>
+                    <TextBlock Style="{DynamicResource TextBlock.Icon}" Grid.Row="2" ToolTip="first created" Text="{DynamicResource Text.Pen}"/>
+                    
+                    <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Date="{Binding EditDate}"/>
+                    <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Grid.Row="1" Date="{Binding ViewDate}"/>
+                    <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Grid.Row="2" Date="{Binding CreateDate}"/>
+
+                    <Grid Grid.Row="4" Grid.ColumnSpan="2">
+                        <Grid.Style>
+                            <Style TargetType="{x:Type Grid}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShowLastLogs}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                         
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="2.5,5">
-                        <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="last edited" Margin="0,0,10,0" FontSize="26" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Wrench}" VerticalAlignment="Center"/>
-                        <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Date="{Binding EditDate}" VerticalAlignment="Center" Postfix=" ago"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="2,5.5">
-                        <TextBlock Style="{DynamicResource TextBlock.Main}" ToolTip="first created" Margin="0,0,10,0" FontSize="26" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Pen}" VerticalAlignment="Center"/>
-                        <res:TimeDisplay Style="{DynamicResource TextBlock.Main}" Date="{Binding CreateDate}" VerticalAlignment="Center" Postfix="ago"/>
-                    </StackPanel>
-                </StackPanel>
+                        <Border Grid.RowSpan="3" Background="{DynamicResource Brush.Background.Tint(2)}" CornerRadius="5"/>
+
+                        <TextBlock Style="{DynamicResource TextBlock.Main}" Text="recent logs" FontWeight="Bold" Margin="0,5,0,3"/>
+                        <ItemsControl ItemsSource="{Binding LastLogs}" Grid.Row="1" Focusable="False" FocusVisualStyle="{x:Null}" Margin="0,0,0,3">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                            <ItemsControl.Resources>
+                                <DataTemplate DataType="{x:Type vmslog:BasicEntryLogViewModel}">
+                                    <Grid Margin="0,4">
+                                        <Border Opacity="0" Style="{DynamicResource Border.Card}" CornerRadius="0"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Margin="5,3" Style="{DynamicResource TextBlock.Icon}" FontSize="16" Text="{Binding Icon}"/>
+                                            <res:TimeDisplay Margin="0,2" Grid.Column="1" 
+                                                             Style="{DynamicResource TimeDisplay}" Date="{Binding Date}"/>
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.Resources>
+                        </ItemsControl>
+
+                        <Button Grid.Row="2" Margin="7,0,7,7" Style="{DynamicResource Button.Base}" Content="view all"/>
+                    </Grid>
+
+
+                </Grid>
             </Grid>
             <Grid Grid.Row="3" Grid.ColumnSpan="2">
+                <Grid.RenderTransform>
+                    <TranslateTransform Y="100"/>
+                </Grid.RenderTransform>
+                <Grid.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)" To="0" BeginTime="0:0:0.30" DecelerationRatio="0.2" Duration="0:0:0.25"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Grid.Triggers>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -105,7 +227,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button TabIndex="4" IsCancel="True" Grid.Column="2">
+                <Button TabIndex="4" IsCancel="True" Grid.Column="2" Height="32">
                     <Button.Style>
                         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Button.Base}">
                             <Setter Property="Content" Value="go back"/>
@@ -119,7 +241,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button TabIndex="3" Grid.Column="3">
+                <Button TabIndex="3" Grid.Column="3" Height="32">
                     <Button.Style>
                         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Button.Primary}">
                             <Setter Property="Content" Value="edit"/>

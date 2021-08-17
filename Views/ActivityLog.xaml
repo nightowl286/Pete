@@ -1,9 +1,25 @@
 ﻿<UserControl x:Class="Pete.Views.ActivityLog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/"             
+             xmlns:prism="http://prismlibrary.com/" 
+             xmlns:viewmodels="clr-namespace:Pete.ViewModels" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              prism:ViewModelLocator.AutoWireViewModel="True">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Margin="15" Style="{DynamicResource Border.Card}"/>
+        <Grid Margin="30,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button IsCancel="{Binding FromDashboard}" Style="{DynamicResource Button.Asset}" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding ShowDashboardCommand}"/>
+        </Grid>
+        <ScrollViewer Grid.Row="1">
             
+        </ScrollViewer>
     </Grid>
 </UserControl>

@@ -10,12 +10,21 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Margin="15" Style="{DynamicResource Border.Card}"/>
-        <Grid Margin="30,30">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RenderTransform>
+                <TranslateTransform Y="-200"/>
+            </Grid.RenderTransform>
+            <Grid.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.35" DecelerationRatio="0.2"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Grid.Triggers>
+            <Border Margin="15" Style="{DynamicResource Border.Card}"/>
+            <Grid Margin="30,30">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -39,6 +48,7 @@
             <Button Grid.Column="4" Style="{DynamicResource Button.Asset}" Content="{DynamicResource Text.Wrench}" Command="{Binding EditCategoryCommand}" ToolTip="edit category"/>
             <Button Grid.Column="5" Style="{DynamicResource Button.Trash}" ToolTip="delete category" Command="{Binding DeleteCategoryCommand}"/>
         </Grid>
+        </Grid>
         <ScrollViewer CanContentScroll="True" Margin="15,0,15,15" Grid.Row="1" Style="{DynamicResource ScrollViewer}" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Entries}" Focusable="False" FocusVisualStyle="{x:Null}">
                 <ItemsControl.ItemsPanel>
@@ -48,8 +58,24 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type vms:EntryPreviewViewModel}">
-                        <Button Margin="7,3" Padding="0" Style="{DynamicResource Button.Base}" HorizontalContentAlignment="Stretch" CommandParameter="{Binding ID}"
+                        <Button Margin="10,3" Padding="0" Style="{DynamicResource Button.Base}" HorizontalContentAlignment="Stretch" CommandParameter="{Binding ID}"
                                 Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.ShowEntryCommand}">
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="(Button.RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.45" DecelerationRatio="0.5" AccelerationRatio="0.4">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CircleEase EasingMode="EaseInOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                            <Button.RenderTransform>
+                                <TranslateTransform X="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=ActualWidth, Mode=OneTime}"/>
+                            </Button.RenderTransform>
                             <Grid Margin="10,10,10,5">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>

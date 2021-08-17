@@ -4,6 +4,21 @@
              xmlns:prism="http://prismlibrary.com/"         
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <Storyboard x:Key="Storyboard.MoveIn">
+            <DoubleAnimation To="0" Duration="0:0:0.35" Storyboard.TargetProperty="(Button.RenderTransform).(TranslateTransform.X)" DecelerationRatio="0.15"/>
+            <DoubleAnimation To="0" Duration="0:0:0.35" Storyboard.TargetProperty="(Button.RenderTransform).(TranslateTransform.Y)" DecelerationRatio="0.15"/>
+            <DoubleAnimation To="1" From="0" Duration="0:0:0.45" Storyboard.TargetProperty="(Button.Opacity)" DecelerationRatio="0.2"/>
+        </Storyboard>
+        <Style x:Key="Button.Dashboard" TargetType="{x:Type Button}" BasedOn="{StaticResource Button.Base}">
+            <!--<Setter Property="Opacity" Value="0"/>-->
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard Storyboard="{StaticResource Storyboard.MoveIn}"/>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <prism:InvokeCommandAction Command="{Binding LoadedCommand}"/>
@@ -19,7 +34,10 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Style="{DynamicResource Button.Base}" Command="{Binding ShowAllCommand}" Grid.Row="0" Grid.Column="0" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ShowAllCommand}" Grid.Row="0" Grid.Column="0" Margin="15,10" Padding="0,15,0,10">
+            <Button.RenderTransform>
+                <TranslateTransform X="-100" Y="-100"/>
+            </Button.RenderTransform>
             <Viewbox StretchDirection="Both">
                 <Grid>
                     <Grid>
@@ -32,7 +50,10 @@
                 </Grid>
             </Viewbox>
         </Button>
-        <Button Style="{DynamicResource Button.Base}" Command="{Binding AddNewCommand}" Grid.Row="0" Grid.Column="1" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding AddNewCommand}" Grid.Row="0" Grid.Column="1" Margin="15,10" Padding="0,15,0,10">
+            <Button.RenderTransform>
+                <TranslateTransform X="100" Y="-100"/>
+            </Button.RenderTransform>
             <Viewbox StretchDirection="Both">
                 <Grid>
                     <Grid>
@@ -45,7 +66,10 @@
                 </Grid>
             </Viewbox>
         </Button>
-        <Button Style="{DynamicResource Button.Base}" Grid.Row="1" Grid.Column="0" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="0" Margin="15,10" Padding="0,15,0,10">
+            <Button.RenderTransform>
+                <TranslateTransform X="-100" Y="100"/>
+            </Button.RenderTransform>
             <Viewbox StretchDirection="Both">
                 <Grid>
                     <Grid>
@@ -98,7 +122,10 @@
                 </Grid>
             </Viewbox>
         </Button>
-        <Button Style="{DynamicResource Button.Base}" Grid.Row="1" Grid.Column="1" Margin="15,10" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="1" Margin="15,10" Padding="0,15,0,10">
+            <Button.RenderTransform>
+                <TranslateTransform X="100" Y="100"/>
+            </Button.RenderTransform>
             <Viewbox StretchDirection="Both">
                 <Grid>
                     <Grid>

@@ -56,6 +56,7 @@ namespace Pete
             containerRegistry.RegisterForNavigation<Dashboard>();
             containerRegistry.RegisterForNavigation<EntryEditor>();
             containerRegistry.RegisterForNavigation<EntryList>();
+            containerRegistry.RegisterForNavigation<Views.ActivityLog>();
 
             containerRegistry.RegisterDialogWindow<GeneralDialogWindow>(nameof(GeneralDialogWindow));
             containerRegistry.RegisterDialog<ConfirmRemoveDialog>();
@@ -66,7 +67,7 @@ namespace Pete
             containerRegistry.RegisterSingleton<ICategoryStore, CategoryStore>();
             containerRegistry.RegisterSingleton<ISettings, Settings>();
             containerRegistry.RegisterSingleton<IEntryStore, EntryStore>();
-            containerRegistry.RegisterSingleton<IActivityLog, ActivityLog>();
+            containerRegistry.RegisterSingleton<IActivityLog, Services.ActivityLog>();
             containerRegistry.Register<IIDManager, IDManager>();
             
         }

@@ -4,7 +4,7 @@
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:local="clr-namespace:Pete"
-        Title="Pete" MinHeight="375" Height="375" MinWidth="550" Width="550" WindowStartupLocation="CenterScreen" Background="{DynamicResource Brush.Background}">
+        Title="Pete" MinHeight="450" Height="450" MinWidth="600" Width="600" WindowStartupLocation="CenterScreen" Background="{DynamicResource Brush.Background}">
     <Grid>
         <ContentControl x:Name="mainRegion" Focusable="False"/>
     </Grid>
