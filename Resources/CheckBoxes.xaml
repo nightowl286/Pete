@@ -23,7 +23,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Border x:Name="Outline" Width="22" HorizontalAlignment="Center" VerticalAlignment="Center" Height="22" Background="Transparent" BorderBrush="{TemplateBinding Background}" BorderThickness="2" CornerRadius="5" Effect="{DynamicResource SmallShadow}"/>
-                        <Path Visibility="Collapsed" Width="14" Height="14" x:Name="CheckMark" SnapsToDevicePixels="False" StrokeThickness="3" Data="M 2 5 L 5 13 L 13 0" Stroke="{TemplateBinding BorderBrush}" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat"/>
+                        <Path Visibility="Collapsed" Width="14" Height="14" x:Name="CheckMark" SnapsToDevicePixels="False" StrokeThickness="3" Data="M 2 5 L 5 12 L 12 2" StrokeLineJoin="Round" Stroke="{TemplateBinding BorderBrush}" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                         <Border Visibility="Collapsed" x:Name="ThreeMark" Background="{TemplateBinding BorderBrush}" Width="10" Height="10" CornerRadius="2"/>
                         <ContentPresenter Margin="6,0,0,0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" RecognizesAccessKey="True" />
                     </Grid>
@@ -47,12 +47,15 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56"/>
+            </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource Brush.Background.Tint(17)}"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tint(50)}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Background.Tint(22.5)}"/>
+                <Setter Property="Background" Value="{DynamicResource Brush.Background.Tint(30)}"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tint(100)}"/>
             </Trigger>
             <MultiTrigger>

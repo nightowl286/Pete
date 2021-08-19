@@ -38,6 +38,7 @@
                     
                     <Color x:Key="Color.Red">#ad3b3b</Color>
                     <Color x:Key="Color.Red.Shade(25)">#812c2c</Color>
+                    <Color x:Key="Color.Red.Shade(50)">#562525</Color>
                     <Color x:Key="Color.Red.Tint(10)">#b54e4e</Color>
                     <Color x:Key="Color.Green">#3bad3b</Color>
 
@@ -81,6 +82,7 @@
                     <SolidColorBrush x:Key="Brush.Red" Color="{DynamicResource Color.Red}"/>
                     <SolidColorBrush x:Key="Brush.Red.Tint(10)" Color="{DynamicResource Color.Red.Tint(10)}"/>
                     <SolidColorBrush x:Key="Brush.Red.Shade(25)" Color="{DynamicResource Color.Red.Shade(25)}"/>
+                    <SolidColorBrush x:Key="Brush.Red.Shade(50)" Color="{DynamicResource Color.Red.Shade(50)}"/>
                     <SolidColorBrush x:Key="Brush.Green" Color="{DynamicResource Color.Green}"/>
 
 
@@ -133,6 +135,10 @@
                         <Setter Property="CornerRadius" Value="1"/>
                         <Setter Property="Effect" Value="{DynamicResource SmallShadow}"/>
                     </Style>
+                    <Style x:Key="Border.Divider.Vertical" TargetType="{x:Type Border}" BasedOn="{StaticResource Border.Divider.Horizontal}">
+                        <Setter Property="Height" Value="NaN"/>
+                        <Setter Property="Width" Value="2"/>
+                    </Style>
 
                     <Style x:Key="Focus.Main">
                         <Setter Property="Control.Template">
@@ -154,10 +160,19 @@
                     </Style>
 
                     <conv:BooleanInverter x:Key="BoolInverter"/>
+                    <conv:FirstDegreeConverter x:Key="FirstDegreeFunction"/>
 
+                    <Storyboard x:Key="Storyboard.SlideIn">
+                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.45" DecelerationRatio="0.5" AccelerationRatio="0.4">
+                            <DoubleAnimation.EasingFunction>
+                                <CircleEase EasingMode="EaseInOut"/>
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                    </Storyboard>
 
                 </ResourceDictionary>
                 <ResourceDictionary Source="Resources/Buttons.xaml"/>
+                <ResourceDictionary Source="Resources/ToggleButtons.xaml"/>
                 <ResourceDictionary Source="Resources/ScrollBars.xaml"/>
                 <ResourceDictionary Source="Resources/ScrollViewers.xaml"/>
                 <ResourceDictionary Source="Resources/Fonts.xaml"/>

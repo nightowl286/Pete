@@ -14,7 +14,8 @@ namespace Pete.Models.Logs
 
     public enum TamperType : byte
     {
-
+        LogWiped = 0,
+        LogRestored = 1,
     }
 
     public enum LogType : byte
@@ -26,9 +27,10 @@ namespace Pete.Models.Logs
         Register = 3,
 
         TamperAttempt = 4,
-        Wiped = 5,
-        Cleanup = 6,
+        Cleanup = 5,
 
-        WarningsSeen = 7,
+        WarningsSeen = 6,
+
+        Reserved = 7,
     }
 }

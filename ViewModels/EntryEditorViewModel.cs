@@ -34,7 +34,7 @@ namespace Pete.ViewModels
         private bool _IsInEditMode;
         private bool _CanDelete = true;
         private ObservableCollection<CategoryViewModel> _Categories;
-        private ObservableCollection<BasicEntryLogViewModel> _LastLogs = new ObservableCollection<BasicEntryLogViewModel>();
+        private ObservableCollection<EditorEntryLogViewModel> _LastLogs = new ObservableCollection<EditorEntryLogViewModel>();
         private bool _ShowLastLogs;
         private int _SelectedCategoryIndex;
         private int _LastSelectedCategoryIndex;
@@ -67,7 +67,7 @@ namespace Pete.ViewModels
         public bool IsInEditMode { get => _IsInEditMode; private set => SetProperty(ref _IsInEditMode, value); }
         public bool CanDelete { get => _CanDelete; private set => SetProperty(ref _CanDelete, value); }
         public ReadOnlyObservableCollection<CategoryViewModel> Categories => new ReadOnlyObservableCollection<CategoryViewModel>(_Categories);
-        public ReadOnlyObservableCollection<BasicEntryLogViewModel> LastLogs => new ReadOnlyObservableCollection<BasicEntryLogViewModel>(_LastLogs);
+        public ReadOnlyObservableCollection<EditorEntryLogViewModel> LastLogs => new ReadOnlyObservableCollection<EditorEntryLogViewModel>(_LastLogs);
         public int SelectedCategoryIndex { get => _SelectedCategoryIndex; set => SetProperty(ref _SelectedCategoryIndex, value); }
         public bool ShowLastLogs { get => _ShowLastLogs; set => SetProperty(ref _ShowLastLogs, value); }
         #region Dates
@@ -221,7 +221,7 @@ namespace Pete.ViewModels
         {
             _LastLogs.Clear();
             foreach (var entry in _ActivityLog.GetLast(_EntryId, LAST_LOG_AMOUNT))
-                _LastLogs.Insert(0, new BasicEntryLogViewModel(entry));
+                _LastLogs.Insert(0, new EditorEntryLogViewModel(entry));
 
             ShowLastLogs = _LastLogs.Count > 0;
         }

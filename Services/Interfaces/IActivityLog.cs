@@ -17,6 +17,7 @@ namespace Pete.Services.Interfaces
         #endregion
 
         #region Methods
+        IEnumerable<LogBase> GetAll();
         void LogDeletion(uint id, string name, string category);
         void InvalidateEntryLogs(uint entryId);
         void LoadEncrypted();

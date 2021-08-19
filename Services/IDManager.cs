@@ -95,15 +95,25 @@ namespace Pete.Services
         public void Claim(IEnumerable<uint> ids)
         {
             ids = ids.OrderBy(n => n);
+            uint counter = 0;
             foreach (uint id in ids)
             {
+                while (counter < id)
+                {
+                    FreedIDs.Add(counter++);
+                    NextID++;
+                }
+
                 if (id == NextID)
                     NextID++;
                 else
                 {
+
                     FreedIDs.Add(id);
                     NextID = id + 1;
+
                 }
+                counter++;
             }
         }
         #endregion

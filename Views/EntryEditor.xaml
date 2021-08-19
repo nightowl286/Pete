@@ -30,7 +30,7 @@
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <local:TextboxHint Hint="entry title" FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" TabIndex="0" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Error="{Binding TitleError}">
+            <local:TextboxHint Hint="entry title" TabIndex="0" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Error="{Binding TitleError}">
                 <local:TextboxHint.RenderTransform>
                     <TranslateTransform Y="-70"/>
                 </local:TextboxHint.RenderTransform>
@@ -52,7 +52,16 @@
                     </Style>
                 </local:TextboxHint.Style>
             </local:TextboxHint>
-            <ComboBox Style="{DynamicResource ComboBox.Category}" Grid.Column="1" TabIndex="1" Margin="10,0,0,0" IsEnabled="{Binding IsInEditMode}" ItemsSource="{Binding Categories}" SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}">
+            <ComboBox Grid.Column="1" TabIndex="1" Margin="10,0,0,0" IsEnabled="{Binding IsInEditMode}" ItemsSource="{Binding Categories}" SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}">
+                <ComboBox.Style>
+                    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBox.Category}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ComboBox.Style>
                 <ComboBox.RenderTransform>
                     <TranslateTransform Y="-70"/>
                 </ComboBox.RenderTransform>
@@ -161,7 +170,7 @@
                         
                         <Border Grid.RowSpan="3" Background="{DynamicResource Brush.Background.Tint(2)}" CornerRadius="5"/>
 
-                        <TextBlock Style="{DynamicResource TextBlock.Main}" Text="recent logs" FontWeight="Bold" Margin="0,5,0,3"/>
+                        <TextBlock Style="{DynamicResource TextBlock.Main}" Text="recent logs" FontWeight="Medium" TextDecorations="Underline" Margin="0,5,0,0"/>
                         <ItemsControl ItemsSource="{Binding LastLogs}" Grid.Row="1" Focusable="False" FocusVisualStyle="{x:Null}" Margin="0,0,0,3">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -169,7 +178,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                             <ItemsControl.Resources>
-                                <DataTemplate DataType="{x:Type vmslog:BasicEntryLogViewModel}">
+                                <DataTemplate DataType="{x:Type vmslog:EditorEntryLogViewModel}">
                                     <Grid Margin="0,4">
                                         <Border Opacity="0" Style="{DynamicResource Border.Card}" CornerRadius="0"/>
                                         <Grid>

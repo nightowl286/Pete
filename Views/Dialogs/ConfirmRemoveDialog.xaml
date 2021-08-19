@@ -59,12 +59,12 @@
 
 
             <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" Margin="0,15,0,0">
-                <Button Style="{DynamicResource Button.Base}" IsCancel="True" Content="keep" Margin="7,3" Command="{Binding GotResultCommand}">
+                <Button Style="{DynamicResource Button.Primary}" IsCancel="True" Content="keep" Margin="7,3" Command="{Binding GotResultCommand}">
                     <Button.CommandParameter>
                         <sys:Boolean>false</sys:Boolean>
                     </Button.CommandParameter>
                 </Button>
-                <Button Style="{DynamicResource Button.Primary}" Content="remove" Margin="7,3" Command="{Binding GotResultCommand}">
+                <Button Style="{DynamicResource Button.Base}" Content="remove" Margin="7,3" Command="{Binding GotResultCommand}">
                     <Button.CommandParameter>
                         <sys:Boolean>true</sys:Boolean>
                     </Button.CommandParameter>

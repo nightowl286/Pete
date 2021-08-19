@@ -85,6 +85,11 @@ namespace Pete.Services
 
                 return new EntryLog(entryType, date, entryId);
             }
+            else if (type == LogType.TamperAttempt)
+            {
+                TamperType tamper = r.ReadTamperType();
+                return new TamperLog(tamper, date);
+            }
 
             return new LogBase(type, date);
         }
@@ -197,6 +202,7 @@ namespace Pete.Services
             File.WriteAllBytes(PATH_LOG, final);
         }
         public void LogFailedLogin() => AddLog(new LogBase(LogType.FailedLogin, DateTime.UtcNow));
+        public IEnumerable<LogBase> GetAll() => _AllLogs;
         public IEnumerable<EntryLog> GetAll(uint entryId)
         {
             if (_EntryLogs.TryGetValue(entryId, out List<EntryLog> list))

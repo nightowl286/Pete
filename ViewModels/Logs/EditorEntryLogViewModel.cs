@@ -7,7 +7,7 @@ using Prism.Mvvm;
 
 namespace Pete.ViewModels.Logs
 {
-    public class BasicEntryLogViewModel : BindableBase
+    public class EditorEntryLogViewModel : BindableBase
     {
         #region Private
         private EntryLogType _Type;
@@ -20,7 +20,7 @@ namespace Pete.ViewModels.Logs
         public DateTime Date { get => _Date; private set => SetProperty(ref _Date, value); }
         public string Icon { get => _Icon; private set => SetProperty(ref _Icon, value); }
         #endregion
-        public BasicEntryLogViewModel(EntryLog log)
+        public EditorEntryLogViewModel(EntryLog log)
         {
             Type = log.EntryType;
             Date = log.Date;

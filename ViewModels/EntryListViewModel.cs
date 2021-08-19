@@ -10,6 +10,9 @@ using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using Pete.Models;
+using System.Threading;
+using System.Windows.Threading;
+using System.Threading.Tasks;
 
 namespace Pete.ViewModels
 {
@@ -26,11 +29,14 @@ namespace Pete.ViewModels
         private readonly IEntryStore _EntryStore;
         private readonly IDialogService _DialogService;
         private int _FilterCategoryIndex = 0;
-        private IEnumerable<EntryPreviewViewModel> _Entries;
+        private ObservableCollection<EntryPreviewViewModel> _Entries = new ObservableCollection<EntryPreviewViewModel>();
         private string _FilterText;
         private bool _IsFiltering;
         private CategoryViewModel _SelectedCategory;
         private bool _ReactToSelectionChanged = true;
+        private CancellationTokenSource _FilterTokenSource;
+        private ManualResetEvent _FilterResetEvent;
+        private Dispatcher _Dispatcher;
         #endregion
 
         #region Properties
@@ -40,7 +46,7 @@ namespace Pete.ViewModels
         public DelegateCommand EditCategoryCommand { get => _EditCategoryCommand; private set => SetProperty(ref _EditCategoryCommand, value); }
         public DelegateCommand DeleteCategoryCommand { get => _DeleteCategoryCommand; private set => SetProperty(ref _DeleteCategoryCommand, value); }
         public DelegateCommand<uint?> ShowEntryCommand { get => _ShowEntryCommand; private set => SetProperty(ref _ShowEntryCommand, value); }
-        public IEnumerable<EntryPreviewViewModel> Entries { get => _Entries; private set => SetProperty(ref _Entries, value); }
+        public ReadOnlyObservableCollection<EntryPreviewViewModel> Entries => new ReadOnlyObservableCollection<EntryPreviewViewModel>(_Entries);
         public string FilterText { get => _FilterText; private set => SetProperty(ref _FilterText, value); }
         public bool IsFiltering { get => _IsFiltering; private set => SetProperty(ref _IsFiltering, value); }
         #endregion
@@ -50,6 +56,7 @@ namespace Pete.ViewModels
             _RegionManager = regionManager;
             _EntryStore = entryStore;
             _DialogService = dialogService;
+            _Dispatcher = Dispatcher.CurrentDispatcher;
 
             _Categories = new ObservableCollection<CategoryViewModel>(categoryStore.Categories);
             _Categories.Insert(0, new CategoryViewModel(null, null, "<show all>"));
@@ -59,6 +66,8 @@ namespace Pete.ViewModels
             EditCategoryCommand = new DelegateCommand(EditCategoryMethod, () => FilterCategoryIndex > 0).ObservesProperty(() => FilterCategoryIndex);
             DeleteCategoryCommand = new DelegateCommand(() => _DialogService.ConfirmRemove(DeleteSelectedCategory, "are you sure you want to remove this category? this action cannot be undone."),
                 () => FilterCategoryIndex > 0).ObservesProperty(() => FilterCategoryIndex);
+
+            _FilterResetEvent = new ManualResetEvent(true);
 
             FilterCategoryChanged();
 
@@ -71,12 +80,42 @@ namespace Pete.ViewModels
         {
             if (!_ReactToSelectionChanged) return;
 
+            if (_FilterTokenSource != null)
+                _FilterTokenSource.Cancel();
+
+            Task.Run(PerformFilter);
+        }
+        private void PerformFilter()
+        {
+            if (_FilterResetEvent.WaitOne())
+            {
+                _FilterResetEvent.Reset();
+                _FilterTokenSource = new CancellationTokenSource();
+            }
+
             _SelectedCategory = _Categories[FilterCategoryIndex];
             uint? filterId = _SelectedCategory.ID;
             IsFiltering = filterId.HasValue;
 
             int totalCount = _EntryStore.Count;
-            Entries = _EntryStore.GetAll(filterId, out int filteredCount);
+            _Dispatcher.Invoke(_Entries.Clear);
+            var temp = _EntryStore.GetAll(filterId, out int filteredCount);
+            int i = 0;
+            foreach(var t in temp)
+            {
+
+                if (_FilterTokenSource.Token.IsCancellationRequested)
+                {
+                    _FilterResetEvent.Set();
+                    return;
+                }
+
+                _Dispatcher.Invoke(() => _Entries.Add(t));
+                FilterText = $"collecting entries... {++i:n0}";
+
+                Task.Delay(App.SLIDE_ANIMATION_INTERVAL).Wait();
+            }
+
 
             string entry = totalCount == 1 ? "entry" : "entries";
 
@@ -84,6 +123,8 @@ namespace Pete.ViewModels
                 FilterText = $"showing {filteredCount:n0} / {totalCount:n0} {entry}";
             else
                 FilterText = $"showing all {totalCount:n0} {entry}";
+
+            _FilterResetEvent.Set();
         }
         #endregion
 

@@ -31,6 +31,7 @@ namespace Pete
     {
         #region Consts
         private const bool SHOW_NAVIGATION_DEBUG = true;
+        public const int SLIDE_ANIMATION_INTERVAL = 15;
         #endregion
 
         #region Prism

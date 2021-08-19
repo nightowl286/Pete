@@ -89,14 +89,6 @@
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource Brush.Background.Tint(8.2)}"/>
                             <Setter Property="Cursor" Value="Hand"/>
                         </Trigger>
-                        <!--<MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsFocused" Value="True"/>
-                                <Condition Property="IsMouseOver" Value="False"/>
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource Brush.Accent.Tint(10)}"/>
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource Brush.Background.Tint(8.2)}"/>
-                        </MultiTrigger>-->
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

@@ -49,45 +49,63 @@ namespace Pete
         #endregion
 
         #region Time Formatting
-        public static string BiggestUnit(this TimeSpan time)
+        public static string BiggestUnit(this TimeSpan time) => BiggestUnit(time, 1);
+        public static string BiggestUnit(this TimeSpan time, int units)
         {
-            double value;
-            string unit;
-            if (time.Days > 0)
+            List<string> parts = new List<string>();
+
+            for(int i = 0; i < units;i++)
             {
-                if (time.Days >= 365)
+                double value;
+                string unit;
+                if (time.Days > 0)
                 {
-                    value = time.Days / 365;
-                    unit = "year";
+                    if (time.Days >= 365)
+                    {
+                        value = time.Days / 365;
+                        unit = "year";
+                        time -= TimeSpan.FromDays(value * 365);
+                    }
+                    else if (time.Days >= 30)
+                    {
+                        value = time.Days / 30;
+                        unit = "month";
+                        time -= TimeSpan.FromDays(value * 30);
+                    }
+                    else
+                    {
+                        value = time.Days;
+                        unit = "day";
+                        time -= TimeSpan.FromDays(value);
+                    }
                 }
-                else if (time.Days >= 30)
+                else if (time.Hours > 0)
                 {
-                    value = time.Days / 30;
-                    unit = "month";
+                    value = time.Hours;
+                    unit = "hour";
+                    time -= TimeSpan.FromHours(value);
+                }
+                else if (time.Minutes > 0)
+                {
+                    value = time.Minutes;
+                    unit = "minute";
+                    time -= TimeSpan.FromMinutes(value);
                 }
                 else
                 {
-                    value = time.Days;
-                    unit = "day";
+                    value = Math.Max(1, time.Seconds);
+                    unit = "second";
+                    time = TimeSpan.Zero;
                 }
+                if (value != 1) unit += "s";
+                parts.Add(value.ToString("N0"));
+                parts.Add(unit);
+
+                if (time == TimeSpan.Zero) break;
             }
-            else if (time.Hours > 0)
-            {
-                value = time.Hours;
-                unit = "hour";
-            }
-            else if (time.Minutes > 0)
-            {
-                value = time.Minutes;
-                unit = "minute";
-            }
-            else
-            {
-                value = Math.Max(1, time.Seconds);
-                unit = "second";
-            }
-            if (value != 1) unit += "s";
-            return $"{value:n0} {unit}";
+
+
+            return string.Join(' ', parts);
         }
         #endregion
 

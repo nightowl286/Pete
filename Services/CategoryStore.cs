@@ -41,6 +41,7 @@ namespace Pete.Services
             _IDManager = idManager;
             _Encryption = encryption;
 
+
             LoadCategories();
         }
 
@@ -96,7 +97,7 @@ namespace Pete.Services
         }
         public CategoryViewModel AddCategory(string name)
         {
-            var token = _IDManager.ReserveNew();
+            ReservationToken<uint> token = _IDManager.ReserveNew();
             CategoryViewModel cat = new CategoryViewModel(this, token.Item, name);
             _IDManager.Take(token);
 
