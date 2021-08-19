@@ -114,6 +114,7 @@ namespace Pete.ViewModels
 
             _Dispatcher.Invoke(_DisplayLogs.Clear);
 
+            double interval = App.SLIDE_ANIMATION_INTERVAL;
             foreach (LogBase log in _AllLogs)
             {
                 BaseLogViewModel toAdd = null;
@@ -132,6 +133,8 @@ namespace Pete.ViewModels
 
                     toAdd = new EntryLogViewModel(entryLog.EntryId, _EntryStore, _CategoryStore, entryLog.Date, text);
                 }
+                else if (log is EntryDeletedLog deletedLog)
+                    toAdd = new EntryLogViewModel(deletedLog.EntryName, deletedLog.CategoryName, deletedLog.Date, "entry deleted");
                 else if ((log.Type == LogType.Login & login) || (log.Type == LogType.Register & register))
                     toAdd = new BaseLogViewModel(log.Date, log.Type == LogType.Login ? "authorised login" : "first registration");
 
@@ -146,7 +149,10 @@ namespace Pete.ViewModels
                     _Dispatcher.Invoke(() => _DisplayLogs.Add(toAdd));
                     LogCountText = $"collecting logs... {_DisplayLogs.Count:n0}";
 
-                    Task.Delay(App.SLIDE_ANIMATION_INTERVAL).Wait();
+                    Task.Delay((int)Math.Ceiling(interval)).Wait();
+                    if (interval > App.SLIDE_ANIMATION_INTERVAL_MINIMUM)
+                        interval -= App.SLIDE_ANIMATION_INTERVAL_DECREMENT;
+
                 }
             }
 

@@ -106,6 +106,7 @@ namespace Pete.ViewModels
             _Dispatcher.Invoke(_Entries.Clear);
             var temp = _EntryStore.GetAll(filterId, out int filteredCount);
             int i = 0;
+            double interval = App.SLIDE_ANIMATION_INTERVAL;
             foreach(var t in temp)
             {
 
@@ -118,7 +119,9 @@ namespace Pete.ViewModels
                 _Dispatcher.Invoke(() => _Entries.Add(t));
                 FilterText = $"collecting entries... {++i:n0}";
 
-                Task.Delay(App.SLIDE_ANIMATION_INTERVAL).Wait();
+                Task.Delay((int)Math.Ceiling(interval)).Wait();
+                if (interval > App.SLIDE_ANIMATION_INTERVAL_MINIMUM)
+                    interval -= App.SLIDE_ANIMATION_INTERVAL_DECREMENT;
             }
 
 

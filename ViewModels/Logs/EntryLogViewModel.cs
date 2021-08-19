@@ -33,5 +33,10 @@ namespace Pete.ViewModels.Logs
             else
                 EntryName = "<missing>";
         }
+        public EntryLogViewModel(string entryName, string categoryName, DateTime date, string text) : base(date, text)
+        {
+            EntryName = entryName;
+            EntryCategory = categoryName;
+        }
     }
 }
