@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using Pete.Views.Login;
 using Pete.Views.Registration;
 using Prism.Regions;

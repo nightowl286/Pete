@@ -37,6 +37,7 @@ namespace Pete.ViewModels
         private CancellationTokenSource _FilterTokenSource;
         private ManualResetEvent _FilterResetEvent;
         private Dispatcher _Dispatcher;
+        private DelegateCommand<uint?> _ShowCategoryCommand;
         #endregion
 
         #region Properties
@@ -46,6 +47,7 @@ namespace Pete.ViewModels
         public DelegateCommand EditCategoryCommand { get => _EditCategoryCommand; private set => SetProperty(ref _EditCategoryCommand, value); }
         public DelegateCommand DeleteCategoryCommand { get => _DeleteCategoryCommand; private set => SetProperty(ref _DeleteCategoryCommand, value); }
         public DelegateCommand<uint?> ShowEntryCommand { get => _ShowEntryCommand; private set => SetProperty(ref _ShowEntryCommand, value); }
+        public DelegateCommand<uint?> ShowCategoryCommand { get => _ShowCategoryCommand; private set => SetProperty(ref _ShowCategoryCommand, value); }
         public ReadOnlyObservableCollection<EntryPreviewViewModel> Entries => new ReadOnlyObservableCollection<EntryPreviewViewModel>(_Entries);
         public string FilterText { get => _FilterText; private set => SetProperty(ref _FilterText, value); }
         public bool IsFiltering { get => _IsFiltering; private set => SetProperty(ref _IsFiltering, value); }
@@ -72,6 +74,9 @@ namespace Pete.ViewModels
             FilterCategoryChanged();
 
             ShowEntryCommand = new DelegateCommand<uint?>(ShowEntryMethod);
+
+            ShowCategoryCommand = new DelegateCommand<uint?>(index => { if (index.HasValue && index < _Categories.Count) 
+                    FilterCategoryIndex = (int)index.Value; });
 
         }
 

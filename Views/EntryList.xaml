@@ -4,7 +4,7 @@
              xmlns:prism="http://prismlibrary.com/"             
              xmlns:vms="clr-namespace:Pete.ViewModels"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             xmlns:res="clr-namespace:Pete.Resources">
+             xmlns:res="clr-namespace:Pete.Resources" Focusable="True" Loaded="UserControl_Main_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

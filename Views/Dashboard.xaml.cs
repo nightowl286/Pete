@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Pete.Views
 {
@@ -11,5 +12,7 @@ namespace Pete.Views
         {
             InitializeComponent();
         }
+
+        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e) => Focus();
     }
 }

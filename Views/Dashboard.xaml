@@ -3,15 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"         
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             prism:ViewModelLocator.AutoWireViewModel="True">
+             prism:ViewModelLocator.AutoWireViewModel="True" Loaded="UserControl_Loaded" Focusable="True">
+    <UserControl.InputBindings>
+        <KeyBinding Key="NumPad1" Command="{Binding ShowAllCommand}"/>
+        <KeyBinding Key="F1" Command="{Binding ShowAllCommand}"/>
+        <KeyBinding Key="D1" Command="{Binding ShowAllCommand}"/>
+        
+        <KeyBinding Key="NumPad2" Command="{Binding AddNewCommand}"/>
+        <KeyBinding Key="F2" Command="{Binding AddNewCommand}"/>
+        <KeyBinding Key="D2" Command="{Binding AddNewCommand}"/>
+
+        <KeyBinding Key="NumPad3" Command="{Binding ActivityLogCommand}"/>
+        <KeyBinding Key="F3" Command="{Binding ActivityLogCommand}"/>
+        <KeyBinding Key="D3" Command="{Binding ActivityLogCommand}"/>
+
+        <KeyBinding Key="NumPad4" />
+        <KeyBinding Key="F4"/>
+        <KeyBinding Key="D4"/>
+    </UserControl.InputBindings>
     <UserControl.Resources>
         <Storyboard x:Key="Storyboard.MoveIn">
             <DoubleAnimation To="0" Duration="0:0:0.35" Storyboard.TargetProperty="(Button.RenderTransform).(TranslateTransform.X)" DecelerationRatio="0.15"/>
             <DoubleAnimation To="0" Duration="0:0:0.35" Storyboard.TargetProperty="(Button.RenderTransform).(TranslateTransform.Y)" DecelerationRatio="0.15"/>
             <DoubleAnimation To="1" From="0" Duration="0:0:0.45" Storyboard.TargetProperty="(Button.Opacity)" DecelerationRatio="0.2"/>
         </Storyboard>
+        <Style x:Key="Border.KeyBind" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{DynamicResource Brush.Background}"/>
+            <Setter Property="Margin" Value="0,-7,0,-0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+        <Style x:Key="TextBlock.KeyBind" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Padding" Value="3,2,4,1"/>
+            <!--<Setter Property="Padding" Value="4,2,3,1"/>-->
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Shade(50)}"/>
+        </Style>
         <Style x:Key="Button.Dashboard" TargetType="{x:Type Button}" BasedOn="{StaticResource Button.Base}">
-            <!--<Setter Property="Opacity" Value="0"/>-->
+            <Setter Property="Margin" Value="15"/>
+            <Setter Property="Padding" Value="0,15,0,10"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
             <Style.Triggers>
                 <EventTrigger RoutedEvent="Loaded">
                     <BeginStoryboard Storyboard="{StaticResource Storyboard.MoveIn}"/>
@@ -34,26 +66,34 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ShowAllCommand}" Grid.Row="0" Grid.Column="0" Margin="15" Padding="0,15,0,10">
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ShowAllCommand}" Grid.Row="0" Grid.Column="0">
             <Button.RenderTransform>
                 <TranslateTransform X="-100" Y="-100"/>
             </Button.RenderTransform>
-            <Viewbox StretchDirection="Both">
-                <Grid>
+            <Grid>
+                <Viewbox StretchDirection="Both">
                     <Grid>
-                        <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#418baa" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.List.Solid}" FontSize="41"/>
-                        <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#2f2f2f" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.List}" FontSize="45"/>
+                        <Grid>
+                            <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#418baa" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.List.Solid}" FontSize="41"/>
+                            <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#2f2f2f" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.List}" FontSize="45"/>
+                        </Grid>
+                        <Viewbox VerticalAlignment="Bottom">
+                            <TextBlock Margin="10,0" Text="list all" FontSize="18" Style="{DynamicResource TextBlock.Main}" FontWeight="Bold" VerticalAlignment="Bottom" />
+                        </Viewbox>
                     </Grid>
-                    <Viewbox VerticalAlignment="Bottom">
-                        <TextBlock Margin="10,0" Text="list all" FontSize="18" Style="{DynamicResource TextBlock.Main}" FontWeight="Bold" VerticalAlignment="Bottom" />
-                    </Viewbox>
-                </Grid>
-            </Viewbox>
+                </Viewbox>
+                <Border Style="{DynamicResource Border.KeyBind}">
+                    <TextBlock Style="{DynamicResource TextBlock.KeyBind}" Text="1"/>
+                </Border>
+            </Grid>
         </Button>
-        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding AddNewCommand}" Grid.Row="0" Grid.Column="1" Margin="15" Padding="0,15,0,10">
+        
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding AddNewCommand}" Grid.Row="0" Grid.Column="1">
             <Button.RenderTransform>
                 <TranslateTransform X="100" Y="-100"/>
             </Button.RenderTransform>
+            <Grid>
+                
             <Viewbox StretchDirection="Both">
                 <Grid>
                     <Grid>
@@ -65,78 +105,94 @@
                     </Viewbox>
                 </Grid>
             </Viewbox>
+                <Border Style="{DynamicResource Border.KeyBind}">
+                    <TextBlock Style="{DynamicResource TextBlock.KeyBind}" Text="2"/>
+                </Border>
+            </Grid>
         </Button>
-        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ActivityLogCommand}" Grid.Row="1" Grid.Column="0" Margin="15" Padding="0,15,0,10">
+        
+        <Button Style="{DynamicResource Button.Dashboard}" Command="{Binding ActivityLogCommand}" Grid.Row="1" Grid.Column="0">
             <Button.RenderTransform>
                 <TranslateTransform X="-100" Y="100"/>
             </Button.RenderTransform>
-            <Viewbox StretchDirection="Both">
-                <Grid>
+            <Grid>
+                <Viewbox StretchDirection="Both">
                     <Grid>
-                        <TextBlock FontFamily="{DynamicResource Font.Assets}" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.Info.Solid}" FontSize="45" RenderTransformOrigin="0.5,0.5">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Foreground" Value="#2f2f2f"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ActivityWarning}" Value="true">
-                                            <Setter Property="Foreground" Value="#c65e48"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                            <TextBlock.RenderTransform>
-                                <ScaleTransform ScaleX="0.97" ScaleY="0.97"/>
-                            </TextBlock.RenderTransform>
-                            
-                        </TextBlock>
-                        
-                        <TextBlock FontFamily="{DynamicResource Font.Assets}" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.Info}" FontSize="45">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Foreground" Value="#c65e48"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ActivityWarning}" Value="True">
-                                            <Setter Property="Foreground" Value="#562626"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                        <Grid>
+                            <TextBlock FontFamily="{DynamicResource Font.Assets}" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.Info.Solid}" FontSize="45" RenderTransformOrigin="0.5,0.5">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Foreground" Value="#2f2f2f"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActivityWarning}" Value="true">
+                                                <Setter Property="Foreground" Value="#c65e48"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                                <TextBlock.RenderTransform>
+                                    <ScaleTransform ScaleX="0.97" ScaleY="0.97"/>
+                                </TextBlock.RenderTransform>
 
-                        <TextBlock Text="!" Foreground="#812525" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,-35,-50,0" FontWeight="Bold" FontFamily="{DynamicResource Font.Main}" FontSize="24" ToolTip="the activity log has been modified!">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ActivityWarning}" Value="true">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                            </TextBlock>
+
+                            <TextBlock FontFamily="{DynamicResource Font.Assets}" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.Info}" FontSize="45">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Foreground" Value="#c65e48"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActivityWarning}" Value="True">
+                                                <Setter Property="Foreground" Value="#562626"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <TextBlock Text="!" Foreground="#812525" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,-35,-50,0" FontWeight="Bold" FontFamily="{DynamicResource Font.Main}" FontSize="24" ToolTip="the activity log has been modified!">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActivityWarning}" Value="true">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <Viewbox VerticalAlignment="Bottom">
+                            <TextBlock Margin="10,0" Text="activity log" FontSize="16" Style="{DynamicResource TextBlock.Main}" FontWeight="Bold" VerticalAlignment="Bottom" />
+                        </Viewbox>
                     </Grid>
-                    <Viewbox VerticalAlignment="Bottom">
-                        <TextBlock Margin="10,0" Text="activity log" FontSize="16" Style="{DynamicResource TextBlock.Main}" FontWeight="Bold" VerticalAlignment="Bottom" />
-                    </Viewbox>
-                </Grid>
-            </Viewbox>
+                </Viewbox>
+                <Border Style="{DynamicResource Border.KeyBind}">
+                    <TextBlock Style="{DynamicResource TextBlock.KeyBind}" Text="3"/>
+                </Border>
+            </Grid>
         </Button>
-        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="1" Margin="15" Padding="0,15,0,10">
+        
+        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="1">
             <Button.RenderTransform>
                 <TranslateTransform X="100" Y="100"/>
             </Button.RenderTransform>
-            <Viewbox StretchDirection="Both">
-                <Grid>
+            <Grid>
+                <Viewbox StretchDirection="Both">
                     <Grid>
-                        <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#5f5f5f" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.Settings.Solid}" FontSize="40"/>
-                        <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#2f2f2f" VerticalAlignment="Center" HorizontalAlignment="Center" Text="" FontSize="45"/>
+                        <Grid>
+                            <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#5f5f5f" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Text.Settings.Solid}" FontSize="40"/>
+                            <TextBlock FontFamily="{DynamicResource Font.Assets}" Foreground="#2f2f2f" VerticalAlignment="Center" HorizontalAlignment="Center" Text="" FontSize="45"/>
+                        </Grid>
+                        <Viewbox VerticalAlignment="Bottom">
+                            <TextBlock Margin="10,0" Text="settings" FontSize="18" Style="{DynamicResource TextBlock.Main}" FontWeight="Bold" VerticalAlignment="Bottom" />
+                        </Viewbox>
                     </Grid>
-                    <Viewbox VerticalAlignment="Bottom">
-                        <TextBlock Margin="10,0" Text="settings" FontSize="18" Style="{DynamicResource TextBlock.Main}" FontWeight="Bold" VerticalAlignment="Bottom" />
-                    </Viewbox>
-                </Grid>
-            </Viewbox>
+                </Viewbox>
+                <Border Style="{DynamicResource Border.KeyBind}">
+                    <TextBlock Style="{DynamicResource TextBlock.KeyBind}" Text="4"/>
+                </Border>
+            </Grid>
         </Button>
     </Grid>
 </UserControl>

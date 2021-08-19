@@ -70,7 +70,6 @@ namespace Pete
             containerRegistry.RegisterSingleton<IEntryStore, EntryStore>();
             containerRegistry.RegisterSingleton<IActivityLog, Services.ActivityLog>();
             containerRegistry.Register<IIDManager, IDManager>();
-            
         }
         #endregion
 
