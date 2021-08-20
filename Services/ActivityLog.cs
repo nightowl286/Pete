@@ -8,6 +8,7 @@ using TNO.BitUtilities;
 using System.Text;
 using System.Linq;
 using Pete.Models;
+using Microsoft.Win32;
 
 namespace Pete.Services
 {
@@ -45,6 +46,10 @@ namespace Pete.Services
         }
 
         #region Methods
+        public void GenerateWarnings()
+        {
+            
+        }
         public void LogDeletion(uint id, string name, string category)
         {
             EntryDeletedLog log = new EntryDeletedLog(DateTime.UtcNow, name, category);
@@ -157,6 +162,7 @@ namespace Pete.Services
             AddLog(new LogBase(LogType.WarningsSeen, now));
 
             _WarningSeenAt = now;
+            HasUnseenWarning = false;
         }
         private void Save()
         {
@@ -228,9 +234,25 @@ namespace Pete.Services
         }
         private void AddLog(LogBase log)
         {
+            DateTime date = log.Date.ToUniversalTime();
+
             _AllLogs.Add(log);
 
             Save();
+
+            FileInfo info = new FileInfo(PATH_LOG);
+            info.LastWriteTimeUtc = date;
+            if (log.Type == LogType.Register)
+                info.CreationTimeUtc = date;
+
+#if DEBUG
+            if (!App.REQUIRE_ADMIN) return;
+#endif
+            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\TNO\Pete", true))
+            {
+                key.SetValue("value", date.Ticks);
+            }
+
         }
         public DateTime Log(uint entryId, EntryLogType type)
         {

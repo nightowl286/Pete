@@ -83,6 +83,7 @@ namespace Pete.ViewModels.Login
                     CanEditPassword = true;
                     PasswordError = "the entered password is incorrect";
                 });
+                _ActivityLog.Log(Models.Logs.LogType.FailedLogin);
             }
         }
         private void GetLoginData(Action<string> updateStatus)

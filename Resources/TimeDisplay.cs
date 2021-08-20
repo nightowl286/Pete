@@ -10,7 +10,7 @@ namespace Pete.Resources
     public class TimeDisplay : TextBlock
     {
         #region Consts
-        private const string DEFAULT_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
+        private const string DEFAULT_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
         #endregion
 
         #region Dependency Properties

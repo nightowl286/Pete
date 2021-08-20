@@ -200,6 +200,32 @@
                             </Grid>
                         </Grid>
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type vmLogs:BaseDangerousLogViewModel}">
+                        <Grid Margin="10,3">
+                            <Grid.RenderTransform>
+                                <TranslateTransform X="{Binding Source={x:Reference Name=UserControl_Main}, Path=ActualWidth, Mode=OneTime}"/>
+                            </Grid.RenderTransform>
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard Storyboard="{StaticResource Storyboard.SlideIn}"/>
+                                </EventTrigger>
+                            </Grid.Triggers>
+                            <Border Style="{DynamicResource Border.Card}" BorderThickness="2" BorderBrush="{DynamicResource Brush.Red.Shade(50)}">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="{DynamicResource Color.Red.Shade(25)}" ShadowDepth="0"/>
+                                </Border.Effect>
+                            </Border>
+                            <Grid Margin="7">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Text}" ToolTip="{Binding Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
                 </ItemsControl.Resources>
             </ItemsControl>
         </ScrollViewer>

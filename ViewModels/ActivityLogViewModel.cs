@@ -133,10 +133,12 @@ namespace Pete.ViewModels
 
                     toAdd = new EntryLogViewModel(entryLog.EntryId, _EntryStore, _CategoryStore, entryLog.Date, text);
                 }
-                else if (log is EntryDeletedLog deletedLog)
+                else if ((log is EntryDeletedLog deletedLog) && eDelete)
                     toAdd = new EntryLogViewModel(deletedLog.EntryName, deletedLog.CategoryName, deletedLog.Date, "entry deleted");
                 else if ((log.Type == LogType.Login & login) || (log.Type == LogType.Register & register))
                     toAdd = new BaseLogViewModel(log.Date, log.Type == LogType.Login ? "authorised login" : "first registration");
+                else if (log.Type == LogType.FailedLogin & failedLogin)
+                    toAdd = new BaseDangerousLogViewModel(log.Date, "failed login");
 
                 if (_FilterTokenSource.Token.IsCancellationRequested)
                 {

@@ -37,7 +37,7 @@ namespace Pete.ViewModels
         #endregion
         public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore, IActivityLog activityLog)
         {
-            ActivityWarning = false;
+            ActivityWarning = activityLog.HasUnseenWarning;
 
             _ActivityLog = activityLog;
             _EntryStore = entryStore;

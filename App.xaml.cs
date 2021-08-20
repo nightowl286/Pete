@@ -21,6 +21,7 @@ using System.Windows.Media;
 using Pete.Views.Dialogs;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
+using System.Security.Principal;
 
 namespace Pete
 {
@@ -34,6 +35,9 @@ namespace Pete
         public const int SLIDE_ANIMATION_INTERVAL = 15;
         public const int SLIDE_ANIMATION_INTERVAL_MINIMUM = 1; // requires at least 1 otherwise the text won't update and it will look like it froze
         public const double SLIDE_ANIMATION_INTERVAL_DECREMENT = 0.2;
+#if DEBUG
+        public const bool REQUIRE_ADMIN = false;
+#endif
         #endregion
 
         #region Prism
@@ -60,6 +64,7 @@ namespace Pete
             containerRegistry.RegisterForNavigation<EntryEditor>();
             containerRegistry.RegisterForNavigation<EntryList>();
             containerRegistry.RegisterForNavigation<Views.ActivityLog>();
+            containerRegistry.RegisterForNavigation<RequireAdmin>();
 
             containerRegistry.RegisterDialogWindow<GeneralDialogWindow>(nameof(GeneralDialogWindow));
             containerRegistry.RegisterDialog<ConfirmRemoveDialog>();
@@ -78,6 +83,12 @@ namespace Pete
         #region Methods
         public void DecideStartScreen(IRegionManager manager)
         {
+            if (!IsAdmin())
+            {
+                manager.RequestNavigate(RegionNames.MainRegion, nameof(RequireAdmin), DebugNavigationCallback);
+                return;
+            }
+
             IEncryptionModule encryption = Container.Resolve<IEncryptionModule>();
 
 #if DEBUG
@@ -126,6 +137,20 @@ namespace Pete
         #endregion
 
         #region Functions
+        private static bool IsAdmin()
+        {
+#if DEBUG
+            if (!REQUIRE_ADMIN) return true;
+#endif
+
+            try
+            {
+                WindowsIdentity user = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(user);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch { return false; }
+        }
         private static IContainerProvider GetContainer() => (App.Current as PrismApplication).Container;
         public static void InitialiseE2FA()
         {
