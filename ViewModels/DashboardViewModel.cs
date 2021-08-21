@@ -26,6 +26,7 @@ namespace Pete.ViewModels
         private DelegateCommand _ShowAllCommand;
         private DelegateCommand _LoadedCommand;
         private DelegateCommand _ActivityLogCommand;
+        private DelegateCommand _SettingsCommand;
         #endregion
 
         #region Properties
@@ -34,6 +35,7 @@ namespace Pete.ViewModels
         public DelegateCommand ShowAllCommand { get => _ShowAllCommand; private set => SetProperty(ref _ShowAllCommand, value); }
         public DelegateCommand LoadedCommand { get => _LoadedCommand; private set => SetProperty(ref _LoadedCommand, value); }
         public DelegateCommand ActivityLogCommand { get => _ActivityLogCommand; private set => SetProperty(ref _ActivityLogCommand, value); }
+        public DelegateCommand SettingsCommand { get => _SettingsCommand; private set => SetProperty(ref _SettingsCommand, value); }
         #endregion
         public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore, IActivityLog activityLog)
         {
@@ -45,8 +47,9 @@ namespace Pete.ViewModels
             _DialogService = dialogService;
             _CategoryStore = categoryStore;
 
-            AddNewCommand = new DelegateCommand(AddNewCallback);
-            ShowAllCommand = new DelegateCommand(() => NavigateTo(nameof(EntryList)));
+            AddNewCommand = new DelegateCommand(AddNewCallback, () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
+            ShowAllCommand = new DelegateCommand(() => NavigateTo(nameof(EntryList)), () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
+            SettingsCommand = new DelegateCommand(() => { }, () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
             ActivityLogCommand = new DelegateCommand(() => NavigateTo(nameof(ActivityLog)));
 
             LoadedCommand = new DelegateCommand(CheckMissingCategories);
@@ -58,7 +61,7 @@ namespace Pete.ViewModels
         #region Events
         private void ActivityLog_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(IActivityLog))
+            if (e.PropertyName == nameof(IActivityLog.HasUnseenWarning))
                 ActivityWarning = _ActivityLog.HasUnseenWarning;
         }
         #endregion

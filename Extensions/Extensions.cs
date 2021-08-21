@@ -225,10 +225,10 @@ namespace Pete
         #region Enum Write
         public static void WriteLogType(this IAdvancedBitWriter w, LogType type) => w.WriteNum((byte)type, 3);
         public static void WriteEntryLogType(this IAdvancedBitWriter w, EntryLogType type) => w.WriteNum((byte)type, 2);
-        public static void WriteTamperType(this IAdvancedBitWriter w, TamperType type) => w.WriteNum((byte)type, 1);
+        public static void WriteTamperType(this IAdvancedBitWriter w, TamperType type) => w.WriteNum((byte)type, 2);
         public static LogType ReadLogType(this IAdvancedBitReader r) => (LogType)(byte)r.ReadNum(3);
         public static EntryLogType ReadEntryLogType(this IAdvancedBitReader r) => (EntryLogType)(byte)r.ReadNum(2);
-        public static TamperType ReadTamperType(this IAdvancedBitReader r) => (TamperType)(byte)r.ReadNum(1);
+        public static TamperType ReadTamperType(this IAdvancedBitReader r) => (TamperType)(byte)r.ReadNum(2);
         #endregion
 
         #region Other

@@ -22,10 +22,10 @@
         <KeyBinding Key="D4"/>
     </UserControl.InputBindings>
     <UserControl.Resources>
-        <Storyboard x:Key="Storyboard.MoveIn">
+        <Storyboard x:Key="Storyboard.MoveIn" FillBehavior="HoldEnd">
             <DoubleAnimation To="0" Duration="0:0:0.35" Storyboard.TargetProperty="(Button.RenderTransform).(TranslateTransform.X)" DecelerationRatio="0.15"/>
             <DoubleAnimation To="0" Duration="0:0:0.35" Storyboard.TargetProperty="(Button.RenderTransform).(TranslateTransform.Y)" DecelerationRatio="0.15"/>
-            <DoubleAnimation To="1" From="0" Duration="0:0:0.45" Storyboard.TargetProperty="(Button.Opacity)" DecelerationRatio="0.2"/>
+            <!--<DoubleAnimation To="1" From="0" Duration="0:0:0.45" Storyboard.TargetProperty="(Button.Opacity)" DecelerationRatio="0.2"/>-->
         </Storyboard>
         <Style x:Key="Border.KeyBind" TargetType="{x:Type Border}">
             <Setter Property="Background" Value="{DynamicResource Brush.Background}"/>
@@ -48,6 +48,9 @@
                 <EventTrigger RoutedEvent="Loaded">
                     <BeginStoryboard Storyboard="{StaticResource Storyboard.MoveIn}"/>
                 </EventTrigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.30"/>
+                </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
@@ -149,7 +152,7 @@
                                 </TextBlock.Style>
                             </TextBlock>
 
-                            <TextBlock Text="!" Foreground="#812525" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,-35,-50,0" FontWeight="Bold" FontFamily="{DynamicResource Font.Main}" FontSize="24" ToolTip="the activity log has been modified!">
+                            <TextBlock Text="!" Foreground="#812525" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,-35,-50,0" FontWeight="Bold" FontFamily="{DynamicResource Font.Main}" FontSize="24" ToolTip="you have some unseen warnings!">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -172,8 +175,8 @@
                 </Border>
             </Grid>
         </Button>
-        
-        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="1">
+
+        <Button Style="{DynamicResource Button.Dashboard}" Grid.Row="1" Grid.Column="1" Command="{Binding SettingsCommand}">
             <Button.RenderTransform>
                 <TranslateTransform X="100" Y="100"/>
             </Button.RenderTransform>

@@ -9,6 +9,9 @@ using System.Text;
 using System.Linq;
 using Pete.Models;
 using Microsoft.Win32;
+using System.Diagnostics;
+using System.Collections.ObjectModel;
+using Pete.Models.Warnings;
 
 namespace Pete.Services
 {
@@ -17,23 +20,33 @@ namespace Pete.Services
         #region Consts
         private const string PATH_DATA = "data";
         private const string PATH_LOG = PATH_DATA + "\\log.data";
+        private const int MAXIMUM_LOG_TIME_DIFFERENCE_MS = 150;
         #endregion
 
         #region Private
         private byte[] _TempData;
         private bool _GotDecrypted;
         private bool _HasUnseenWarning;
-        private bool _HasRegistrationLog;
-        private DateTime _WarningSeenAt;
+        private LogBase _RegistrationLog;
+        private DateTime? _WarningSeenAt;
         private DateTime _LastCleanup;
         private Dictionary<uint, List<EntryLog>> _EntryLogs;
         private List<LogBase> _AllLogs;
         private readonly IEncryptionModule _EncryptionModule;
+        private DateTime? _LastLogWriteReg;
+        private DateTime? _LastLogWriteFile;
+        private DateTime? _LastLogCreateTime;
+        private DateTime? _LastRegWrite;
+        private bool _WasRegTypeChanged;
+        private bool _WasLogTampered;
+        private LogBase _LastLog;
+        private ObservableCollection<WarningBase> _Warnings = new ObservableCollection<WarningBase>();
         #endregion
 
         #region Properties
         public bool GotDecrypted { get => _GotDecrypted; private set => SetProperty(ref _GotDecrypted, value); }
         public bool HasUnseenWarning { get => _HasUnseenWarning; private set => SetProperty(ref _HasUnseenWarning, value); }
+        public ReadOnlyObservableCollection<WarningBase> Warnings => new ReadOnlyObservableCollection<WarningBase>(_Warnings);
         #endregion
         public ActivityLog(IEncryptionModule encryptionModule)
         {
@@ -46,9 +59,87 @@ namespace Pete.Services
         }
 
         #region Methods
+        private void LoadLastLogDate()
+        {
+            if (File.Exists(PATH_LOG))
+            {
+                FileInfo file = new FileInfo(PATH_LOG);
+                _LastLogWriteFile = file.LastWriteTimeUtc;
+                _LastLogCreateTime = file.CreationTimeUtc;
+            }
+
+            Debug.WriteLine($"[Log write time]: {_LastLogWriteFile}.{_LastLogWriteFile?.Millisecond}");
+            Debug.WriteLine($"[Log create time]: {_LastLogCreateTime}");
+
+
+#if DEBUG
+            if (!App.REQUIRE_ADMIN) return;
+#endif
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\TNO\Pete", false))
+            {
+                if (key != null)
+                {
+                    object got = key.GetValue("value", null);
+                    if (got is long gotLong)
+                        _LastLogWriteReg = new DateTime(gotLong);
+                    else if (got != null)
+                        _WasRegTypeChanged = true;
+
+                    _LastRegWrite = key.GetLastWrite();
+                }
+            }
+
+            Debug.WriteLine($"[Reg key time]: {_LastRegWrite}.{_LastRegWrite?.Millisecond}");
+        }
         public void GenerateWarnings()
         {
-            
+            _Warnings.Clear();
+
+            #region Failed logins
+            List<WarningFailedLogin> failedLogins = new List<WarningFailedLogin>();
+            for (int i = _AllLogs.Count - 1; i >= 0; i--)
+            {
+                LogBase log = _AllLogs[i];
+                if (log.Type == LogType.WarningsSeen)
+                    break;
+
+                if (log.Type == LogType.FailedLogin)
+                    failedLogins.Add(new WarningFailedLogin(log.Date));
+            }
+            if (failedLogins.Count == 1)
+                _Warnings.Add(failedLogins[0]);
+            else if (failedLogins.Count > 1)
+                _Warnings.Add(new WarningFailedLoginGroup(failedLogins.ToArray()));
+            #endregion
+
+            if (_RegistrationLog == null)
+                _Warnings.Add(new WarningLogWiped());
+
+            bool registerDateInvalid = _RegistrationLog != null && _RegistrationLog.Date != _LastLogCreateTime;
+            bool writeInvalid = _LastLogWriteFile == null || _LastRegWrite == null || _LastLogWriteReg == null;
+            if (!writeInvalid)
+            {
+                if (_LastLogWriteFile != _LastLogWriteReg)
+                    writeInvalid = true;
+                else
+                {
+                    double timeDif = _LastRegWrite.Value.Subtract(_LastLogWriteFile.Value).TotalMilliseconds;
+                    if (Math.Abs(timeDif) >= MAXIMUM_LOG_TIME_DIFFERENCE_MS)
+                        writeInvalid = true;
+                }
+            }
+
+            if (registerDateInvalid || writeInvalid)
+                _Warnings.Add(new WarningLogRestored());
+
+            Debug.WriteLine($"[Activity Warnings]: {(_Warnings.Count == 0 ? "None" : _Warnings.Count.ToString("N0"))}");
+            foreach (WarningBase warning in _Warnings)
+                Debug.WriteLine("  " + warning.GetType().Name);
+            Debug.WriteLine("");
+
+
+
+            HasUnseenWarning = _Warnings.Count > 0;
         }
         public void LogDeletion(uint id, string name, string category)
         {
@@ -105,7 +196,7 @@ namespace Pete.Services
             else if (log.Type == LogType.Cleanup && _LastCleanup < log.Date)
                 _LastCleanup = log.Date;
             else if (log.Type == LogType.Register)
-                _HasRegistrationLog = true;
+                _RegistrationLog = log;
             else if (log is EntryLog entryLog && entryLog.EntryId.HasValue)
                 AddEntryLog(entryLog);
         }
@@ -124,13 +215,13 @@ namespace Pete.Services
                     _AllLogs.Add(log);
 
                     CheckLogType(log);
-                    
+
                 }
 
                 int encryptedBytes = r.Read<int>();
                 _TempData = r.ReadBytes((ulong)encryptedBytes * 8UL);
-
             }
+            LoadLastLogDate();
         }
         public void LoadEncrypted()
         {
@@ -154,7 +245,16 @@ namespace Pete.Services
                 }
 
                 _AllLogs.InsertRange(0, logs);
+
+                if (logs.Count > 0)
+                    _LastLog = logs[^1];
+
             }
+
+            if (_AllLogs.Count > 0)
+                Debug.WriteLine($"[Last log time]: {_AllLogs[^1].Date}.{_AllLogs[^1].Date.Millisecond}");
+
+            GenerateWarnings();
         }
         public void SeenWarnings()
         {
@@ -162,6 +262,11 @@ namespace Pete.Services
             AddLog(new LogBase(LogType.WarningsSeen, now));
 
             _WarningSeenAt = now;
+            _Warnings.Clear();
+
+            if (_RegistrationLog == null)
+                Log(LogType.Register);
+
             HasUnseenWarning = false;
         }
         private void Save()
@@ -249,9 +354,7 @@ namespace Pete.Services
             if (!App.REQUIRE_ADMIN) return;
 #endif
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\TNO\Pete", true))
-            {
-                key.SetValue("value", date.Ticks);
-            }
+                key.SetValue("value", date.Ticks, RegistryValueKind.QWord);
 
         }
         public DateTime Log(uint entryId, EntryLogType type)

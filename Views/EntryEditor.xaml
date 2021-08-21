@@ -147,9 +147,9 @@
                     <TextBlock Style="{DynamicResource TextBlock.Icon}" ToolTip="last viewed" Text="{DynamicResource Text.Eye}"/>
                     <TextBlock Style="{DynamicResource TextBlock.Icon}" Grid.Row="1"  ToolTip="last edited" Text="{DynamicResource Text.Wrench}"/>
                     <TextBlock Style="{DynamicResource TextBlock.Icon}" Grid.Row="2" ToolTip="first created" Text="{DynamicResource Text.Pen}"/>
-                    
-                    <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Date="{Binding EditDate}"/>
-                    <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Grid.Row="1" Date="{Binding ViewDate}"/>
+
+                    <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Date="{Binding ViewDate}"/>
+                    <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Grid.Row="1" Date="{Binding EditDate}"/>
                     <res:TimeDisplay Style="{DynamicResource TimeDisplay}" Grid.Column="1" Grid.Row="2" Date="{Binding CreateDate}"/>
 
                     <Grid Grid.Row="4" Grid.ColumnSpan="2">
@@ -195,7 +195,7 @@
                             </ItemsControl.Resources>
                         </ItemsControl>
 
-                        <Button Grid.Row="2" Margin="7,0,7,7" Style="{DynamicResource Button.Base}" Content="view all"/>
+                        <Button Grid.Row="2" Margin="7,0,7,7" Visibility="Collapsed" Style="{DynamicResource Button.Base}" Content="view all"/>
                     </Grid>
 
 

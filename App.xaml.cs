@@ -36,7 +36,7 @@ namespace Pete
         public const int SLIDE_ANIMATION_INTERVAL_MINIMUM = 1; // requires at least 1 otherwise the text won't update and it will look like it froze
         public const double SLIDE_ANIMATION_INTERVAL_DECREMENT = 0.2;
 #if DEBUG
-        public const bool REQUIRE_ADMIN = false;
+        public const bool REQUIRE_ADMIN = true;
 #endif
         #endregion
 

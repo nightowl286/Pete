@@ -15,6 +15,9 @@ using Pete.Views;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
+using Pete.ViewModels.Warnings;
+using Pete.Models.Warnings;
+using Pete.Services;
 
 namespace Pete.ViewModels
 {
@@ -44,6 +47,9 @@ namespace Pete.ViewModels
         private CancellationTokenSource _FilterTokenSource;
         private ManualResetEvent _FilterResetEvent;
         private Dispatcher _Dispatcher;
+        private bool _ShowWarnings;
+        private ObservableCollection<WarningBaseViewModel> _Warnings = new ObservableCollection<WarningBaseViewModel>();
+        private DelegateCommand _WarningsSeenCommand;
         #endregion
         #region Properties
         public bool FromDashboard { get => _FromDashboard; private set => SetProperty(ref _FromDashboard, value); }
@@ -54,6 +60,9 @@ namespace Pete.ViewModels
         public string FilterText { get => _FilterText; private set => SetProperty(ref _FilterText, value); }
         public string LogCountText { get => _LogCountText; private set => SetProperty(ref _LogCountText, value); }
         public ReadOnlyObservableCollection<BaseLogViewModel> DisplayLogs => new ReadOnlyObservableCollection<BaseLogViewModel>(_DisplayLogs);
+        public bool ShowWarnings { get => _ShowWarnings; private set => SetProperty(ref _ShowWarnings, value); }
+        public ReadOnlyObservableCollection<WarningBaseViewModel> Warnings => new ReadOnlyObservableCollection<WarningBaseViewModel>(_Warnings);
+        public DelegateCommand WarningsSeenCommand { get => _WarningsSeenCommand; private set => SetProperty(ref _WarningsSeenCommand, value); }
         #endregion
         public ActivityLogViewModel(IActivityLog activityLog, IEntryStore entryStore, ICategoryStore categoryStore, IRegionManager regionManager)
         {
@@ -67,15 +76,49 @@ namespace Pete.ViewModels
 
             InitFilters();
 
-            _AllLogs = activityLog.GetAll().Reverse();
-            _AllLogCount = _AllLogs.Count();
-            LogCountText = $"showing all {_AllLogCount:n0} log entries";
+            
+            
             _FilterResetEvent = new ManualResetEvent(true);
 
-            StartFilterLogs();
+            if (!_ActivityLog.HasUnseenWarning)
+                InitalLogSetup();
+
+            WarningsSeenCommand = new DelegateCommand(WarningsSeen).ObservesCanExecute(() => ShowWarnings);
+
+            foreach(WarningBase warning in _ActivityLog.Warnings)
+            {
+                    if (warning is WarningLogWiped) _Warnings.Add(new WarningBaseViewModel("log has been wiped"));
+                    else if (warning is WarningLogRestored) _Warnings.Add(new WarningBaseViewModel("log has been tampered with"));
+                    else if (warning is WarningFailedLogin failed) _Warnings.Add(new WarningFailedLoginViewModel("a failed login attempt", failed.At));
+                    else if (warning is WarningFailedLoginGroup failedGroup)
+                    {
+                        WarningFailedLoginViewModel[] failedVms = new WarningFailedLoginViewModel[failedGroup.Attempts.Length];
+                        for (int i = 0; i < failedVms.Length; i++)
+                            failedVms[i] = new WarningFailedLoginViewModel("failed login attempt", failedGroup.Attempts[i].At);
+                        _Warnings.Add(new WarningFailedLoginGroupViewModel($"{failedVms.Length} failed login attempt{(failedVms.Length == 1 ? "" : "s")}", failedVms));
+                    }
+            }
+
+            ShowWarnings = _ActivityLog.HasUnseenWarning;
         }
 
         #region Methods
+        private void InitalLogSetup()
+{
+            _AllLogs = _ActivityLog.GetAll().Reverse();
+            _AllLogCount = _AllLogs.Count();
+
+            LogCountText = $"showing all {_AllLogCount:n0} log entries";
+            ShowWarnings = _ActivityLog.HasUnseenWarning;
+            StartFilterLogs();
+        }
+        private void WarningsSeen()
+        {
+            _ActivityLog.SeenWarnings();
+            InitalLogSetup();
+            ShowWarnings = false;
+            _Warnings.Clear();
+        }
         private void InitFilters()
         {
             _Filters = new ObservableCollection<bool>();
@@ -115,6 +158,8 @@ namespace Pete.ViewModels
             _Dispatcher.Invoke(_DisplayLogs.Clear);
 
             double interval = App.SLIDE_ANIMATION_INTERVAL;
+            Task.Delay(App.SLIDE_ANIMATION_INTERVAL).Wait();
+
             foreach (LogBase log in _AllLogs)
             {
                 BaseLogViewModel toAdd = null;
@@ -139,6 +184,8 @@ namespace Pete.ViewModels
                     toAdd = new BaseLogViewModel(log.Date, log.Type == LogType.Login ? "authorised login" : "first registration");
                 else if (log.Type == LogType.FailedLogin & failedLogin)
                     toAdd = new BaseDangerousLogViewModel(log.Date, "failed login");
+                else if (log.Type == LogType.WarningsSeen & warningsSeen)
+                    toAdd = new BaseLogViewModel(log.Date, "warnings marked as seen");
 
                 if (_FilterTokenSource.Token.IsCancellationRequested)
                 {

@@ -4,230 +4,338 @@
              xmlns:prism="http://prismlibrary.com/" 
              xmlns:viewmodels="clr-namespace:Pete.ViewModels" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:vmLogs="clr-namespace:Pete.ViewModels.Logs" xmlns:resources="clr-namespace:Pete.Resources"
+             xmlns:vmLogs="clr-namespace:Pete.ViewModels.Logs"
+             xmlns:resources="clr-namespace:Pete.Resources"
+             xmlns:vmWarnings="clr-namespace:Pete.ViewModels.Warnings"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
         <Grid>
-            <Grid.RenderTransform>
-                <TranslateTransform Y="-200"/>
-            </Grid.RenderTransform>
-            <Grid.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.35" DecelerationRatio="0.2"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Grid.Triggers>
-            <Border Margin="15" Style="{DynamicResource Border.Card}"/>
-            <Grid Margin="30,30">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ShowWarnings}" Value="True">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.RenderTransform>
+                    <TranslateTransform Y="-200"/>
+                </Grid.RenderTransform>
+                <Grid.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.35" DecelerationRatio="0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Grid.Triggers>
+                <Border Margin="15" Style="{DynamicResource Border.Card}"/>
+                <Grid Margin="30,30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button ToolTip="go back" Content="{DynamicResource Text.Arrow.Left}" Command="{Binding GoBackCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Button.Asset}">
+                                <Setter Property="IsCancel" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding FromDashboard}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Setter Property="IsCancel" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button IsCancel="{Binding FromDashboard}" Style="{DynamicResource Button.Asset}" Grid.Column="1" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding ShowDashboardCommand}"/>
+
+                    <TextBlock Grid.Column="2" Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Margin="5,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{Binding LogCountText}" ToolTip="{Binding LogCountText}"/>
+
+                    <Grid Grid.Column="3">
+                        <Grid.Style>
+                            <Style TargetType="{x:Type Grid}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsShowingFromEntry}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ToggleButton Style="{DynamicResource ToggleButton.Base}" x:Name="ButtonFilter" IsChecked="{Binding ElementName=FilterPopup,Path=IsOpen}" Grid.Column="1">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Bottom" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.ArrowHead.Down}"/>
+                                <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding FilterText}" Margin="7,0,0,0"/>
+                            </StackPanel>
+                        </ToggleButton>
+                        <Popup x:Name="FilterPopup" KeyDown="FilterPopup_KeyDown" StaysOpen="False" PlacementTarget="{Binding ElementName=ButtonFilter}" Placement="Custom"  AllowsTransparency="True" VerticalOffset="-3" PopupAnimation="Slide" Opened="FilterPopup_Opened" MaxHeight="250">
+                            <Grid>
+                                <Border Margin="5" CornerRadius="3" Background="{DynamicResource Brush.Background.Tint(3.88)}" Effect="{DynamicResource SmallShadow}"/>
+                                <ScrollViewer Margin="5" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Orientation="Vertical" Margin="10,5">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBox.Main}">
+                                                <Setter Property="Margin" Value="0,3"/>
+                                                <Setter Property="Focusable" Value="True"/>
+                                                <Setter Property="IsTabStop" Value="True"/>
+                                                <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Small}"/>
+                                                <Setter Property="FontSize" Value="14"/>
+                                            </Style>
+                                            <Style x:Key="Header" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
+                                                <Setter Property="TextAlignment" Value="Left"/>
+                                                <Setter Property="Margin" Value="0,10,0,0"/>
+                                                <Setter Property="TextDecorations" Value="Underline"/>
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <TextBlock Style="{DynamicResource Header}" Text="general logs" Margin="0"/>
+                                        <CheckBox Content="login" x:Name="FilterFirstOption" IsChecked="{Binding Filters[0]}"/>
+                                        <CheckBox Content="registration" IsChecked="{Binding Filters[1]}"/>
+                                        <CheckBox Content="cleanup" IsChecked="{Binding Filters[2]}"/>
+
+                                        <TextBlock Style="{DynamicResource Header}" Text="entry logs"/>
+                                        <CheckBox Content="missing" IsChecked="{Binding Filters[3]}"/>
+                                        <CheckBox Content="viewed" IsChecked="{Binding Filters[4]}"/>
+                                        <CheckBox Content="edited" IsChecked="{Binding Filters[5]}"/>
+                                        <CheckBox Content="created" IsChecked="{Binding Filters[6]}"/>
+                                        <CheckBox Content="deleted" IsChecked="{Binding Filters[7]}"/>
+
+                                        <TextBlock Style="{DynamicResource Header}" Text="warnings"/>
+                                        <CheckBox Content="failed login" IsChecked="{Binding Filters[8]}"/>
+                                        <CheckBox Content="warnings seen" IsChecked="{Binding Filters[9]}"/>
+
+                                        <TextBlock Style="{DynamicResource Header}" Text="tamper attempts"/>
+                                        <CheckBox Content="log wipe" IsChecked="{Binding Filters[10]}"/>
+                                        <CheckBox Content="log restore" IsChecked="{Binding Filters[11]}"/>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                        </Popup>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <ScrollViewer Focusable="False" Style="{DynamicResource ScrollViewer}" Grid.Row="1" Margin="15,0,15,15" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding DisplayLogs}" Focusable="False" FocusVisualStyle="{x:Null}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type vmLogs:EntryLogViewModel}">
+                            <Grid Margin="10,3">
+                                <Grid.RenderTransform>
+                                    <TranslateTransform X="{Binding Source={x:Reference Name=UserControl_Main}, Path=ActualWidth, Mode=OneTime}"/>
+                                </Grid.RenderTransform>
+                                <Grid.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard Storyboard="{StaticResource Storyboard.SlideIn}"/>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+                                <Border Style="{DynamicResource Border.Card}"/>
+                                <Grid Margin="7">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding EntryName}" VerticalAlignment="Center" ToolTip="{Binding EntryName}" MaxWidth="120" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding EntryMissing}" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource Brush.Red.Shade(50)}"/>
+                                                        <Setter Property="Padding" Value="5,2"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <Border Grid.Column="1" Style="{DynamicResource Border.Divider.Vertical}" Margin="5,0"/>
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <StackPanel.Style>
+                                            <Style TargetType="{x:Type StackPanel}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding EntryCategory}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <Border VerticalAlignment="Center" Background="{DynamicResource Brush.Background}" CornerRadius="5">
+                                            <TextBlock Style="{DynamicResource TextBlock.Main}" MaxWidth="100" ToolTip="{Binding EntryCategory}" Text="{Binding EntryCategory}" TextWrapping="NoWrap" Margin="5,3" TextTrimming="CharacterEllipsis"/>
+                                        </Border>
+                                        <Border Style="{DynamicResource Border.Divider.Vertical}" Margin="5,0"/>
+                                    </StackPanel>
+
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Grid.Column="3" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Text="{Binding Text}" ToolTip="{Binding Text}" VerticalAlignment="Center"/>
+
+                                    <resources:TimeDisplay Grid.Column="4" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vmLogs:BaseLogViewModel}">
+                            <Grid Margin="10,3">
+                                <Grid.RenderTransform>
+                                    <TranslateTransform X="{Binding Source={x:Reference Name=UserControl_Main}, Path=ActualWidth, Mode=OneTime}"/>
+                                </Grid.RenderTransform>
+                                <Grid.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard Storyboard="{StaticResource Storyboard.SlideIn}"/>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+                                <Border Style="{DynamicResource Border.Card}"/>
+                                <Grid Margin="7">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Text}" ToolTip="{Binding Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vmLogs:BaseDangerousLogViewModel}">
+                            <Grid Margin="10,3">
+                                <Grid.RenderTransform>
+                                    <TranslateTransform X="{Binding Source={x:Reference Name=UserControl_Main}, Path=ActualWidth, Mode=OneTime}"/>
+                                </Grid.RenderTransform>
+                                <Grid.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard Storyboard="{StaticResource Storyboard.SlideIn}"/>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+                                <Border Style="{DynamicResource Border.Card}" BorderThickness="2" BorderBrush="{DynamicResource Brush.Red.Shade(50)}">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="{DynamicResource Color.Red.Shade(25)}" ShadowDepth="0"/>
+                                    </Border.Effect>
+                                </Border>
+                                <Grid Margin="7">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Text}" ToolTip="{Binding Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ShowWarnings}" Value="False">
+                            <Setter Property="IsEnabled" Value="False"/>
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Border Background="Black" Opacity="0.6"/>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button ToolTip="go back" Content="{DynamicResource Text.Arrow.Left}" Command="{Binding GoBackCommand}">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Button.Asset}">
-                            <Setter Property="IsCancel" Value="True"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding FromDashboard}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Setter Property="IsCancel" Value="False"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-                <Button IsCancel="{Binding FromDashboard}" Style="{DynamicResource Button.Asset}" Grid.Column="1" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding ShowDashboardCommand}"/>
+                <Border Style="{DynamicResource Border.Card}" Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="-10"/>
+                <TextBlock Style="{DynamicResource TextBlock.Main}" FontSize="20" Foreground="{DynamicResource Brush.Red}">
+                    <Run Text="you have"/>
+                    <Run Text="{Binding Warnings.Count, StringFormat=N0, Mode=OneWay}"/>
+                    <Run Text="unseen"/>
+                    <Run>
+                        <Run.Style>
+                            <Style TargetType="{x:Type Run}">
+                                <Setter Property="Text" Value="warnings"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Warnings.Count}" Value="1">
+                                        <Setter Property="Text" Value="warning"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Run.Style>
+                    </Run>
+                </TextBlock>
+                <CheckBox x:Name="CheckBox_ShowPrecise" Style="{DynamicResource CheckBox.Main}" Grid.Column="1" Content="precise time" Margin="15,0,0,0"/>
 
-                <TextBlock Grid.Column="2" Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Margin="5,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{Binding LogCountText}" ToolTip="{Binding LogCountText}"/>
-                
-                <Grid Grid.Column="3">
-                    <Grid.Style>
-                        <Style TargetType="{x:Type Grid}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsShowingFromEntry}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Style>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <ToggleButton Style="{DynamicResource ToggleButton.Base}" x:Name="ButtonFilter" IsChecked="{Binding ElementName=FilterPopup,Path=IsOpen}" Grid.Column="1">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Bottom" FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.ArrowHead.Down}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding FilterText}" Margin="7,0,0,0"/>
-                        </StackPanel>
-                    </ToggleButton>
-                    <Popup x:Name="FilterPopup" KeyDown="FilterPopup_KeyDown" StaysOpen="False" PlacementTarget="{Binding ElementName=ButtonFilter}" Placement="Custom"  AllowsTransparency="True" VerticalOffset="-3" PopupAnimation="Slide" Opened="FilterPopup_Opened" MaxHeight="250">
-                        <Grid>
-                            <Border Margin="5" CornerRadius="3" Background="{DynamicResource Brush.Background.Tint(3.88)}" Effect="{DynamicResource SmallShadow}"/>
-                            <ScrollViewer Margin="5" VerticalScrollBarVisibility="Auto">
-                                <StackPanel Orientation="Vertical" Margin="10,5">
-                                    <StackPanel.Resources>
-                                        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CheckBox.Main}">
-                                            <Setter Property="Margin" Value="0,3"/>
-                                            <Setter Property="Focusable" Value="True"/>
-                                            <Setter Property="IsTabStop" Value="True"/>
-                                            <Setter Property="FocusVisualStyle" Value="{DynamicResource Focus.Small}"/>
-                                            <Setter Property="FontSize" Value="14"/>
-                                        </Style>
-                                        <Style x:Key="Header" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
-                                            <Setter Property="TextAlignment" Value="Left"/>
-                                            <Setter Property="Margin" Value="0,10,0,0"/>
-                                            <Setter Property="TextDecorations" Value="Underline"/>
-                                        </Style>
-                                    </StackPanel.Resources>
-                                    
-                                    <TextBlock Style="{DynamicResource Header}" Text="general logs" Margin="0"/>
-                                    <CheckBox Content="login" x:Name="FilterFirstOption" IsChecked="{Binding Filters[0]}"/>
-                                    <CheckBox Content="registration" IsChecked="{Binding Filters[1]}"/>
-                                    <CheckBox Content="cleanup" IsChecked="{Binding Filters[2]}"/>
-                                    
-                                    <TextBlock Style="{DynamicResource Header}" Text="entry logs"/>
-                                    <CheckBox Content="missing" IsChecked="{Binding Filters[3]}"/>
-                                    <CheckBox Content="viewed" IsChecked="{Binding Filters[4]}"/>
-                                    <CheckBox Content="edited" IsChecked="{Binding Filters[5]}"/>
-                                    <CheckBox Content="created" IsChecked="{Binding Filters[6]}"/>
-                                    <CheckBox Content="deleted" IsChecked="{Binding Filters[7]}"/>
-
-                                    <TextBlock Style="{DynamicResource Header}" Text="warnings"/>
-                                    <CheckBox Content="failed login" IsChecked="{Binding Filters[8]}"/>
-                                    <CheckBox Content="warnings seen" IsChecked="{Binding Filters[9]}"/>
-                                    
-                                    <TextBlock Style="{DynamicResource Header}" Text="tamper attempts"/>
-                                    <CheckBox Content="log wipe" IsChecked="{Binding Filters[10]}"/>
-                                    <CheckBox Content="log restore" IsChecked="{Binding Filters[11]}"/>
+                <ScrollViewer Margin="0,10" Focusable="False" Style="{DynamicResource ScrollViewer}" Grid.Row="1" VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2">
+                    <ItemsControl ItemsSource="{Binding Warnings}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.Resources>
+                            <DataTemplate DataType="{x:Type vmWarnings:WarningBaseViewModel}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" HorizontalAlignment="Left" Margin="0,2" FontSize="16">
+                                        <Run FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Dash}" FontSize="10"/>
+                                        <Run Text="{Binding Text,Mode=OneWay}"/>
+                                    </TextBlock>
                                 </StackPanel>
-                            </ScrollViewer>
-                        </Grid>
-                    </Popup>
-                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type vmWarnings:WarningFailedLoginViewModel}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" HorizontalAlignment="Left" Margin="0,2" FontSize="16">
+                                        <Run FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Dash}" FontSize="10"/>
+                                        <Run Text="{Binding Text,Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <Border Style="{DynamicResource Border.Divider.Vertical}" Margin="7,0"/>
+                                    <resources:TimeDisplay Style="{DynamicResource TextBlock.Main}" Postfix=" ago" UnitCount="2" ShowPrecise="{Binding ElementName=CheckBox_ShowPrecise, Path=IsChecked}" Date="{Binding Date}" FontSize="16" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type vmWarnings:WarningFailedLoginGroupViewModel}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Style="{DynamicResource TextBlock.Main}" HorizontalAlignment="Left" Margin="0,2" FontSize="16">
+                                            <Run FontFamily="{DynamicResource Font.Assets}" Text="{DynamicResource Text.Dash}" FontSize="10"/>
+                                            <Run Text="{Binding Text,Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <ItemsControl Grid.Row="1" ItemsSource="{Binding FailedLoginWarnings}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Vertical" Margin="15,0,0,0"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.Resources>
+                    </ItemsControl>
+                </ScrollViewer>
+                <Button Grid.Row="2" Style="{DynamicResource Button.Primary}" Command="{Binding WarningsSeenCommand}" HorizontalAlignment="Right" Content="mark as seen" Grid.ColumnSpan="2"/>
             </Grid>
         </Grid>
-        <ScrollViewer Focusable="False" Style="{DynamicResource ScrollViewer}" Grid.Row="1" Margin="15,0,15,15" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding DisplayLogs}" Focusable="False" FocusVisualStyle="{x:Null}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.Resources>
-                    <DataTemplate DataType="{x:Type vmLogs:EntryLogViewModel}">
-                        <Grid Margin="10,3">
-                            <Grid.RenderTransform>
-                                <TranslateTransform X="{Binding Source={x:Reference Name=UserControl_Main}, Path=ActualWidth, Mode=OneTime}"/>
-                            </Grid.RenderTransform>
-                            <Grid.Triggers>
-                                <EventTrigger RoutedEvent="Loaded">
-                                    <BeginStoryboard Storyboard="{StaticResource Storyboard.SlideIn}"/>
-                                </EventTrigger>
-                            </Grid.Triggers>
-                            <Border Style="{DynamicResource Border.Card}"/>
-                            <Grid Margin="7">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding EntryName}" VerticalAlignment="Center" ToolTip="{Binding EntryName}" MaxWidth="120" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding EntryMissing}" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource Brush.Red.Shade(50)}"/>
-                                                    <Setter Property="Padding" Value="5,2"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <Border Grid.Column="1" Style="{DynamicResource Border.Divider.Vertical}" Margin="5,0"/>
-                                
-                                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                    <StackPanel.Style>
-                                        <Style TargetType="{x:Type StackPanel}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding EntryCategory}" Value="{x:Null}">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </StackPanel.Style>
-                                    <Border VerticalAlignment="Center" Background="{DynamicResource Brush.Background}" CornerRadius="5">
-                                        <TextBlock Style="{DynamicResource TextBlock.Main}" MaxWidth="100" ToolTip="{Binding EntryCategory}" Text="{Binding EntryCategory}" TextWrapping="NoWrap" Margin="5,3" TextTrimming="CharacterEllipsis"/>
-                                    </Border>
-                                    <Border Style="{DynamicResource Border.Divider.Vertical}" Margin="5,0"/>
-                                </StackPanel>
-
-                                <TextBlock Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Grid.Column="3" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Text="{Binding Text}" ToolTip="{Binding Text}" VerticalAlignment="Center"/>
-                                
-                                <resources:TimeDisplay Grid.Column="4" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
-                            </Grid>
-                        </Grid>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type vmLogs:BaseLogViewModel}">
-                        <Grid Margin="10,3">
-                            <Grid.RenderTransform>
-                                <TranslateTransform X="{Binding Source={x:Reference Name=UserControl_Main}, Path=ActualWidth, Mode=OneTime}"/>
-                            </Grid.RenderTransform>
-                            <Grid.Triggers>
-                                <EventTrigger RoutedEvent="Loaded">
-                                    <BeginStoryboard Storyboard="{StaticResource Storyboard.SlideIn}"/>
-                                </EventTrigger>
-                            </Grid.Triggers>
-                            <Border Style="{DynamicResource Border.Card}"/>
-                            <Grid Margin="7">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Text}" ToolTip="{Binding Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
-                            </Grid>
-                        </Grid>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type vmLogs:BaseDangerousLogViewModel}">
-                        <Grid Margin="10,3">
-                            <Grid.RenderTransform>
-                                <TranslateTransform X="{Binding Source={x:Reference Name=UserControl_Main}, Path=ActualWidth, Mode=OneTime}"/>
-                            </Grid.RenderTransform>
-                            <Grid.Triggers>
-                                <EventTrigger RoutedEvent="Loaded">
-                                    <BeginStoryboard Storyboard="{StaticResource Storyboard.SlideIn}"/>
-                                </EventTrigger>
-                            </Grid.Triggers>
-                            <Border Style="{DynamicResource Border.Card}" BorderThickness="2" BorderBrush="{DynamicResource Brush.Red.Shade(50)}">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="{DynamicResource Color.Red.Shade(25)}" ShadowDepth="0"/>
-                                </Border.Effect>
-                            </Border>
-                            <Grid Margin="7">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Text}" ToolTip="{Binding Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
-                            </Grid>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.Resources>
-            </ItemsControl>
-        </ScrollViewer>
     </Grid>
 </UserControl>

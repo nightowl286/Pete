@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Text;
 using Pete.Models;
 using Pete.Models.Logs;
+using Pete.Models.Warnings;
 
 namespace Pete.Services.Interfaces
 {
@@ -14,6 +15,7 @@ namespace Pete.Services.Interfaces
         #region Properties
         bool GotDecrypted { get; }
         bool HasUnseenWarning { get; }
+        ReadOnlyObservableCollection<WarningBase> Warnings { get; }
         #endregion
 
         #region Methods

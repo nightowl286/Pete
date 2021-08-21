@@ -19,6 +19,7 @@ namespace Pete.Resources
         public static readonly DependencyProperty DateProperty = DependencyProperty.Register(nameof(Date), typeof(DateTime?), typeof(TimeDisplay), new PropertyMetadata(null, new PropertyChangedCallback(UpdateDate)));
         public static readonly DependencyProperty RelativeDateProperty = DependencyProperty.Register(nameof(RelativeDate), typeof(DateTime?), typeof(TimeDisplay), new PropertyMetadata(null, new PropertyChangedCallback(UpdateDate)));
         public static readonly DependencyProperty UnitCountProperty = DependencyProperty.Register(nameof(UnitCount), typeof(int), typeof(TimeDisplay), new PropertyMetadata(1, new PropertyChangedCallback(UpdateDate)));
+        public static readonly DependencyProperty ShowPreciseProperty = DependencyProperty.Register(nameof(ShowPrecise), typeof(bool), typeof(TimeDisplay), new PropertyMetadata(false, new PropertyChangedCallback(UpdateDate)));
         #endregion
 
         #region Static
@@ -28,6 +29,7 @@ namespace Pete.Resources
 
         #region Properties
         public int UnitCount { get => (int)GetValue(UnitCountProperty); set => SetValue(UnitCountProperty, value); }
+        public bool ShowPrecise { get => (bool)GetValue(ShowPreciseProperty); set => SetValue(ShowPreciseProperty, value); }
         public string ToolTipDateFormat { get => GetValue(ToolTipDateFormatProperty) as string; set => SetValue(ToolTipDateFormatProperty, value); }
         public string Postfix { get => GetValue(PostfixProperty) as string; set => SetValue(PostfixProperty, value); }
         public DateTime? Date { get => GetValue(DateProperty) as DateTime?; set => SetValue(DateProperty, value); }
@@ -54,11 +56,17 @@ namespace Pete.Resources
             {
                 DateTime rel = RelativeDate.HasValue ? RelativeDate.Value.ToUniversalTime() : DateTime.UtcNow;
 
-                string str = rel.Subtract(Date.Value.ToUniversalTime()).BiggestUnit(Math.Max(1, UnitCount));
-                if (Postfix != null) str += Postfix;
-                Text = str;
+                string tooltipText = Date.Value.ToLocalTime().ToString(ToolTipDateFormat ?? DEFAULT_DATE_FORMAT);
+                ToolTip = tooltipText;
 
-                ToolTip = Date.Value.ToLocalTime().ToString(ToolTipDateFormat ?? DEFAULT_DATE_FORMAT);
+                if (ShowPrecise)
+                    Text = tooltipText;
+                else
+                {
+                    string str = rel.Subtract(Date.Value.ToUniversalTime()).BiggestUnit(Math.Max(1, UnitCount));
+                    if (Postfix != null) str += Postfix;
+                    Text = str;
+                }
             }
             else
             {
