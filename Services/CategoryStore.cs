@@ -66,8 +66,6 @@ namespace Pete.Services
                     string name = r.ReadString(Encoding.UTF8);
 
                     _Categories.Add(new CategoryViewModel(this, id, name));
-
-                    Debug.WriteLine($"[CategoryStore] Loaded: #{id} - {name}");
                 }
 
                 _IDManager.Clear();
@@ -104,8 +102,6 @@ namespace Pete.Services
             _Categories.Add(cat);
 
             SaveCategories();
-
-            Debug.WriteLine($"[CategoryStore] Added: #{token.Item} - {name}");
 
             return cat;
         }

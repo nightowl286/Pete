@@ -195,7 +195,7 @@
                             </ItemsControl.Resources>
                         </ItemsControl>
 
-                        <Button Grid.Row="2" Margin="7,0,7,7" Visibility="Collapsed" Style="{DynamicResource Button.Base}" Content="view all"/>
+                        <Button Grid.Row="2" Margin="7,0,7,7" Style="{DynamicResource Button.Base}" Content="view all" Command="{Binding ShowAllLogsCommand}"/>
                     </Grid>
 
 

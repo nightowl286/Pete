@@ -22,6 +22,7 @@ namespace Pete.ViewModels
         private readonly IDialogService _DialogService;
         private readonly ICategoryStore _CategoryStore;
         private readonly IActivityLog _ActivityLog;
+        private readonly ISettings _Settings;
         private DelegateCommand _AddNewCommand;
         private DelegateCommand _ShowAllCommand;
         private DelegateCommand _LoadedCommand;
@@ -37,7 +38,7 @@ namespace Pete.ViewModels
         public DelegateCommand ActivityLogCommand { get => _ActivityLogCommand; private set => SetProperty(ref _ActivityLogCommand, value); }
         public DelegateCommand SettingsCommand { get => _SettingsCommand; private set => SetProperty(ref _SettingsCommand, value); }
         #endregion
-        public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore, IActivityLog activityLog)
+        public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore, IActivityLog activityLog, ISettings settings)
         {
             ActivityWarning = activityLog.HasUnseenWarning;
 
@@ -46,6 +47,8 @@ namespace Pete.ViewModels
             _RegionManager = regionManager;
             _DialogService = dialogService;
             _CategoryStore = categoryStore;
+            _Settings = settings;
+            settings.Load();
 
             AddNewCommand = new DelegateCommand(AddNewCallback, () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
             ShowAllCommand = new DelegateCommand(() => NavigateTo(nameof(EntryList)), () => !ActivityWarning).ObservesProperty(() => ActivityWarning);

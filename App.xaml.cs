@@ -22,6 +22,7 @@ using Pete.Views.Dialogs;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Security.Principal;
+using Microsoft.Win32;
 
 namespace Pete
 {
@@ -43,12 +44,9 @@ namespace Pete
         #region Prism
         protected override Window CreateShell()
         {
-
             ReloadImages();
             MakeGlobalCommands();
             Container.Resolve<IActivityLog>();
-
-            Container.Resolve<ISettings>().Load();
 
             return Container.Resolve<MainWindow>();
         }
@@ -91,10 +89,10 @@ namespace Pete
 
             IEncryptionModule encryption = Container.Resolve<IEncryptionModule>();
 
-#if DEBUG
+//#if DEBUG
             if (SkipToDashboard(manager))
                 return;
-#endif
+//#endif
 
 
             manager.RequestNavigate(RegionNames.MainRegion, encryption.HasSavedMaster() ? nameof(LoginPassword) : nameof(RegistrationPassword), DebugNavigationCallback);
@@ -167,6 +165,7 @@ namespace Pete
                 Debug.WriteLine($"Navigating to '{result.Context.Uri}' failed, reason: {result.Error?.Message}");
         }
         public static void DisplayThreadId([CallerMemberName] string name = "Unknown") => Debug.WriteLine($"[{name}] Thread ID: {System.Windows.Threading.Dispatcher.CurrentDispatcher.Thread.ManagedThreadId}");
+        public static int ThreadId() => System.Windows.Threading.Dispatcher.CurrentDispatcher.Thread.ManagedThreadId;
         #endregion
     }
 }

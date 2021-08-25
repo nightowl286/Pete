@@ -13,6 +13,7 @@ using Pete.Models;
 using System.Threading;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using Pete.Other;
 
 namespace Pete.ViewModels
 {
@@ -23,6 +24,7 @@ namespace Pete.ViewModels
         private DelegateCommand _OpenDashboardCommand;
         private DelegateCommand _EditCategoryCommand;
         private DelegateCommand _DeleteCategoryCommand;
+        private DelegateCommand _AddNewCommand;
         private DelegateCommand<uint?> _ShowEntryCommand;
         private readonly ICategoryStore _CategoryStore;
         private readonly IRegionManager _RegionManager;
@@ -34,15 +36,15 @@ namespace Pete.ViewModels
         private bool _IsFiltering;
         private CategoryViewModel _SelectedCategory;
         private bool _ReactToSelectionChanged = true;
-        private CancellationTokenSource _FilterTokenSource;
-        private ManualResetEvent _FilterResetEvent;
         private Dispatcher _Dispatcher;
         private DelegateCommand<uint?> _ShowCategoryCommand;
+        private ThreadedQueue _DisplayThread;
         #endregion
 
         #region Properties
         public ReadOnlyObservableCollection<CategoryViewModel> Categories => new ReadOnlyObservableCollection<CategoryViewModel>(_Categories);
         public int FilterCategoryIndex { get => _FilterCategoryIndex; set => SetProperty(ref _FilterCategoryIndex, value, FilterCategoryChanged); }
+        public DelegateCommand AddNewCommand { get => _AddNewCommand; private set => SetProperty(ref _AddNewCommand, value); }
         public DelegateCommand OpenDashboardCommand { get => _OpenDashboardCommand; private set => SetProperty(ref _OpenDashboardCommand, value); }
         public DelegateCommand EditCategoryCommand { get => _EditCategoryCommand; private set => SetProperty(ref _EditCategoryCommand, value); }
         public DelegateCommand DeleteCategoryCommand { get => _DeleteCategoryCommand; private set => SetProperty(ref _DeleteCategoryCommand, value); }
@@ -63,13 +65,14 @@ namespace Pete.ViewModels
             _Categories = new ObservableCollection<CategoryViewModel>(categoryStore.Categories);
             _Categories.Insert(0, new CategoryViewModel(null, null, "<show all>"));
 
+            AddNewCommand = new DelegateCommand(AddNewCommandPayload);
             OpenDashboardCommand = new DelegateCommand(() => _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(Dashboard), App.DebugNavigationCallback));
 
             EditCategoryCommand = new DelegateCommand(EditCategoryMethod, () => FilterCategoryIndex > 0).ObservesProperty(() => FilterCategoryIndex);
             DeleteCategoryCommand = new DelegateCommand(() => _DialogService.ConfirmRemove(DeleteSelectedCategory, "are you sure you want to remove this category? this action cannot be undone."),
                 () => FilterCategoryIndex > 0).ObservesProperty(() => FilterCategoryIndex);
 
-            _FilterResetEvent = new ManualResetEvent(true);
+            _DisplayThread = new ThreadedQueue();
 
             FilterCategoryChanged();
 
@@ -85,18 +88,23 @@ namespace Pete.ViewModels
         {
             if (!_ReactToSelectionChanged) return;
 
-            if (_FilterTokenSource != null)
-                _FilterTokenSource.Cancel();
 
-            Task.Run(PerformFilter);
+            _DisplayThread.CancelAllThenSchedule(PerformFilter);
         }
-        private void PerformFilter()
+        #endregion
+
+        #region Methods
+        private void AddNewCommandPayload()
         {
-            if (_FilterResetEvent.WaitOne())
+            _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(EntryEditor), App.DebugNavigationCallback, new NavigationParameters()
             {
-                _FilterResetEvent.Reset();
-                _FilterTokenSource = new CancellationTokenSource();
-            }
+
+                {"token",_EntryStore.GetNewID() }
+            });
+        }
+        private async Task PerformFilter(CancellationToken cancelToken)
+        {
+            if (cancelToken.IsCancellationRequested) return;
 
             _SelectedCategory = _Categories[FilterCategoryIndex];
             uint? filterId = _SelectedCategory.ID;
@@ -110,16 +118,12 @@ namespace Pete.ViewModels
             foreach(var t in temp)
             {
 
-                if (_FilterTokenSource.Token.IsCancellationRequested)
-                {
-                    _FilterResetEvent.Set();
-                    return;
-                }
+                if (cancelToken.IsCancellationRequested) return;
 
                 _Dispatcher.Invoke(() => _Entries.Add(t));
                 FilterText = $"collecting entries... {++i:n0}";
 
-                Task.Delay((int)Math.Ceiling(interval)).Wait();
+                await Task.Delay((int)Math.Ceiling(interval));
                 if (interval > App.SLIDE_ANIMATION_INTERVAL_MINIMUM)
                     interval -= App.SLIDE_ANIMATION_INTERVAL_DECREMENT;
             }
@@ -129,14 +133,14 @@ namespace Pete.ViewModels
 
             if (filterId.HasValue)
                 FilterText = $"showing {filteredCount:n0} / {totalCount:n0} {entry}";
+            else if (totalCount == 1)
+                FilterText = "showing the only entry";
+            else if (totalCount == 0)
+                FilterText = "you have no entries";
             else
-                FilterText = $"showing all {totalCount:n0} {entry}";
+                FilterText = $"showing all {totalCount:n0} entries";
 
-            _FilterResetEvent.Set();
         }
-        #endregion
-
-        #region Methods
         private void EditCategoryMethod()
         {
             _DialogService.Input(EditCategoryCallback, "edit category", "please enter the new name you wish to use for this category.", "new category name",
@@ -180,7 +184,11 @@ namespace Pete.ViewModels
                 });
         }
         public bool IsNavigationTarget(NavigationContext navigationContext) => false;
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            _DisplayThread.CancelAll();
+            _DisplayThread = null;
+        }
         public void OnNavigatedTo(NavigationContext navigationContext) { }
         #endregion
     }

@@ -25,29 +25,31 @@
             </Grid.Triggers>
             <Border Margin="15" Style="{DynamicResource Border.Card}"/>
             <Grid Margin="30,30">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Button IsCancel="True" Style="{DynamicResource Button.Asset}" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding OpenDashboardCommand}"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button IsCancel="True" Style="{DynamicResource Button.Asset}" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding OpenDashboardCommand}"/>
+                <Button Grid.Column="1" Style="{DynamicResource Button.Asset}" ToolTip="add new entry" Content="{DynamicResource Text.Add}" Command="{Binding AddNewCommand}"/>
 
-            <TextBlock Grid.Column="1" Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Margin="5,0" TextWrapping="NoWrap" ToolTip="{Binding FilterText}" Text="{Binding FilterText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Margin="5,0" TextWrapping="NoWrap" ToolTip="{Binding FilterText}" Text="{Binding FilterText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
 
-            <TextBlock Style="{DynamicResource TextBlock.Main}" Grid.Column="2" Text="filter by" VerticalAlignment="Center"/>
-            <ComboBox Style="{DynamicResource ComboBox.Category}" Grid.Column="3" Margin="5,0,5,0" ItemsSource="{Binding Categories}" SelectedIndex="{Binding FilterCategoryIndex,Mode=TwoWay}">
+            <TextBlock Style="{DynamicResource TextBlock.Main}" Grid.Column="3" Text="filter by" VerticalAlignment="Center"/>
+            <ComboBox Style="{DynamicResource ComboBox.Category}" Grid.Column="4" Margin="5,0,5,0" ItemsSource="{Binding Categories}" SelectedIndex="{Binding FilterCategoryIndex,Mode=TwoWay}">
                 <ComboBox.Resources>
                     <DataTemplate DataType="{x:Type vms:CategoryViewModel}">
                         <TextBlock Style="{DynamicResource TextBlock.ComboBox.Category}"/>
                     </DataTemplate>
                 </ComboBox.Resources>
             </ComboBox>
-            <Button Grid.Column="4" Style="{DynamicResource Button.Asset}" Content="{DynamicResource Text.Wrench}" Command="{Binding EditCategoryCommand}" ToolTip="edit category"/>
-            <Button Grid.Column="5" Style="{DynamicResource Button.Trash}" ToolTip="delete category" Command="{Binding DeleteCategoryCommand}"/>
-        </Grid>
+            <Button Grid.Column="5" Style="{DynamicResource Button.Asset}" ToolTipService.ShowOnDisabled="True" Content="{DynamicResource Text.Wrench}" Command="{Binding EditCategoryCommand}" ToolTip="edit selected category"/>
+                <Button Grid.Column="6" Style="{DynamicResource Button.Trash}" ToolTipService.ShowOnDisabled="True" ToolTip="delete selected category" Command="{Binding DeleteCategoryCommand}"/>
+            </Grid>
         </Grid>
         <ScrollViewer Margin="15,0,15,15" Grid.Row="1" Focusable="False" Style="{DynamicResource ScrollViewer}" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Entries}" Focusable="False" FocusVisualStyle="{x:Null}">

@@ -16,7 +16,6 @@ namespace Pete.Models.Logs
     {
         LogWiped = 0,
         LogRestored = 1,
-        EvasionAttempt = 2,
     }
 
     public enum LogType : byte

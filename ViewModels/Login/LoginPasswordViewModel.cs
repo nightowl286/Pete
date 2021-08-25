@@ -92,6 +92,7 @@ namespace Pete.ViewModels.Login
 
             _ActivityLog.LoadEncrypted();
             _ActivityLog.Log(Models.Logs.LogType.Login);
+            
 
             _Dispatcher.Invoke(() => _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(Dashboard), App.DebugNavigationCallback));
         }

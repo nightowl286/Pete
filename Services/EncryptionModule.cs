@@ -58,10 +58,11 @@ namespace Pete.Services
         public EncryptionModule(ISettings settings)
         {
             _Settings = settings;
+            settings.Encryption = this;
         }
 
         #region Methods
-#if DEBUG
+//#if DEBUG
         public bool LoadDebug()
         {
             if (!File.Exists(PATH_DEBUG))
@@ -102,7 +103,7 @@ namespace Pete.Services
                 w.Dispose();
             }
         }
-#endif
+//#endif
         public bool HasSavedDevice() => File.Exists(PATH_HASH_USB);
         public bool HasSavedMaster() => File.Exists(PATH_HASH_MASTER);
         public bool CheckMaster(string master)

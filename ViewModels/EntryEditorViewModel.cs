@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Pete.Models;
 using Pete.Models.Logs;
 using Pete.Services.Interfaces;
 using Pete.ViewModels.Logs;
+using Pete.Views;
 using Pete.Views.Dialogs;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -26,7 +28,7 @@ namespace Pete.ViewModels
         #endregion
 
         #region Private
-        private uint _EntryId;
+        private uint? _EntryId;
         private ReservationToken<uint> _ReservedToken;
         private string _Title = "";
         private string _TitleError;
@@ -51,8 +53,10 @@ namespace Pete.ViewModels
         private DelegateCommand _GoBackCommand;
         private DelegateCommand _DeleteEntryCommand;
         private DelegateCommand _ComboBoxSelection;
+        private DelegateCommand _ShowAllLogsCommand;
         #endregion
         private readonly IDialogService _DialogService;
+        private readonly IRegionManager _RegionManager;
         private readonly IEntryStore _EntryStore;
         private readonly ICategoryStore _CategoryStore;
         private readonly IActivityLog _ActivityLog;
@@ -61,6 +65,7 @@ namespace Pete.ViewModels
         #endregion
 
         #region Properties
+        public uint? EntryId { get => _EntryId; private set => SetProperty(ref _EntryId, value); }
         public string Title { get => _Title; set => SetProperty(ref _Title, value, TitleEdited); }
         public string TitleError { get => _TitleError; private set => SetProperty(ref _TitleError, value); }
         public string Data { get => _Data; set => SetProperty(ref _Data, value); }
@@ -82,12 +87,14 @@ namespace Pete.ViewModels
         public DelegateCommand GoBackCommand { get => _GoBackCommand; private set => SetProperty(ref _GoBackCommand, value); }
         public DelegateCommand DeleteEntryCommand { get => _DeleteEntryCommand; private set => SetProperty(ref _DeleteEntryCommand, value); }
         public DelegateCommand ComboBoxSelection { get => _ComboBoxSelection; private set => SetProperty(ref _ComboBoxSelection, value); }
+        public DelegateCommand ShowAllLogsCommand { get => _ShowAllLogsCommand; private set => SetProperty(ref _ShowAllLogsCommand, value); }
         #endregion
         #endregion
-        public EntryEditorViewModel(IDialogService dialogService, IEntryStore entryStore, ICategoryStore categoryStore, IActivityLog activityLog)
+        public EntryEditorViewModel(IDialogService dialogService, IRegionManager regionManager, IEntryStore entryStore, ICategoryStore categoryStore, IActivityLog activityLog)
         {
             _Dispatcher = Dispatcher.CurrentDispatcher;
 
+            _RegionManager = regionManager;
             _DialogService = dialogService;
             _EntryStore = entryStore;
             _CategoryStore = categoryStore;
@@ -105,6 +112,9 @@ namespace Pete.ViewModels
             DeleteEntryCommand = new DelegateCommand(() => _DialogService.ConfirmRemove(DeleteEntryConfirmation, "are you sure you want to remove this entry? this action cannot be undone."), () => CanDelete && !IsInEditMode).ObservesProperty(() => CanDelete).ObservesProperty(() => IsInEditMode);
 
             ComboBoxSelection = new DelegateCommand(CategorySelectedChanged).ObservesCanExecute(() => IsInEditMode);
+
+            ShowAllLogsCommand = new DelegateCommand(ShowAllLogsCallback, () => EntryId.HasValue && !IsInEditMode).ObservesProperty(() => EntryId).ObservesProperty(() => IsInEditMode);
+
         }
 
         #region Events
@@ -189,27 +199,27 @@ namespace Pete.ViewModels
             uint? selectedCategory = _Categories[SelectedCategoryIndex].ID;
 
             if (_ReservedToken == null)
-                _EntryStore.UpdateData(_EntryId, selectedCategory, Title, data);
+                _EntryStore.UpdateData(_EntryId.Value, selectedCategory, Title, data);
             else
             {
                 _EntryStore.AddEntry(_ReservedToken, selectedCategory, Title, data);
 
-                _EntryId = _ReservedToken.Item;
+                EntryId = _ReservedToken.Item;
                 _ReservedToken = null;
                 CanDelete = true;
-                CreateDate = _ActivityLog.Log(_EntryId, EntryLogType.Create);
+                CreateDate = _ActivityLog.Log(_EntryId.Value, EntryLogType.Create);
             }
             IsInEditMode = false;
 
 
-            EditDate = _OpenDate = _ActivityLog.Log(_EntryId, EntryLogType.Edit);
+            EditDate = _OpenDate = _ActivityLog.Log(_EntryId.Value, EntryLogType.Edit);
 
             UpdateRecentLogs();
 
         }
         private void DeleteEntryConfirmation()
         {
-            _EntryStore.RemoveEntry(_EntryId);
+            _EntryStore.RemoveEntry(_EntryId.Value);
 
 
             GoBackCommand.Execute();
@@ -217,10 +227,18 @@ namespace Pete.ViewModels
         #endregion
 
         #region Methods
+        private void ShowAllLogsCallback()
+        {
+            _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(Views.ActivityLog), App.DebugNavigationCallback, new NavigationParameters()
+            {
+                {"show-for-entry", EntryId.Value },
+                {"go-back-parameters", new NavigationParameters(){{"id",EntryId.Value}} }
+            });
+        }
         private void UpdateRecentLogs()
         {
             _LastLogs.Clear();
-            foreach (var entry in _ActivityLog.GetLast(_EntryId, LAST_LOG_AMOUNT))
+            foreach (var entry in _ActivityLog.GetLast(_EntryId.Value, LAST_LOG_AMOUNT))
                 _LastLogs.Insert(0, new EditorEntryLogViewModel(entry));
 
             ShowLastLogs = _LastLogs.Count > 0;
@@ -238,17 +256,18 @@ namespace Pete.ViewModels
         }
         private void SetDataFromEntry()
         {
-            _EntryStore.GetInfo(_EntryId, out uint? category, out string title);
+            _EntryStore.GetInfo(_EntryId.Value, out uint? category, out string title);
             SelectCategory(category);
             Title = title;
 
-            Data = Encoding.UTF8.GetString(_EntryStore.GetData(_EntryId));
+            Data = Encoding.UTF8.GetString(_EntryStore.GetData(_EntryId.Value));
         }
         public bool IsNavigationTarget(NavigationContext navigationContext) => false;
         public void OnNavigatedFrom(NavigationContext navigationContext) { }
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             GoBackCommand = new DelegateCommand(navigationContext.NavigationService.Journal.GoBack);
+
             if (navigationContext.Parameters.TryGetValue("token", out ReservationToken<uint> token))
             {
                 ShowLastLogs = false;
@@ -265,7 +284,7 @@ namespace Pete.ViewModels
             }
             else if (navigationContext.Parameters.TryGetValue("id", out uint id))
             {
-                _EntryId = id;
+                EntryId = id;
                 _ActivityLog.GetLastAll(id, out var view, out var edit, out var create);
 
                 UpdateRecentLogs();

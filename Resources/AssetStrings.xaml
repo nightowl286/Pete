@@ -11,6 +11,7 @@
     <sys:String x:Key="Text.List"></sys:String>
     <sys:String x:Key="Text.List.Solid"></sys:String>
     <sys:String x:Key="Text.Plus"></sys:String>
+    <sys:String x:Key="Text.Add"></sys:String>
     <sys:String x:Key="Text.Circle.Mask"></sys:String>
     <sys:String x:Key="Text.Eye"></sys:String>
     <sys:String x:Key="Text.Pen"></sys:String>

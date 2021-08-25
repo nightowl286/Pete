@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using Pete.Models.Warnings;
+using System.Windows;
 
 namespace Pete.Services
 {
@@ -29,7 +30,7 @@ namespace Pete.Services
         private bool _HasUnseenWarning;
         private LogBase _RegistrationLog;
         private DateTime? _WarningSeenAt;
-        private DateTime _LastCleanup;
+        private DateTime? _LastCleanup;
         private Dictionary<uint, List<EntryLog>> _EntryLogs;
         private List<LogBase> _AllLogs;
         private readonly IEncryptionModule _EncryptionModule;
@@ -59,6 +60,10 @@ namespace Pete.Services
         }
 
         #region Methods
+        public void RunCleanup()
+        {
+
+        }
         private void LoadLastLogDate()
         {
             if (File.Exists(PATH_LOG))
@@ -67,10 +72,6 @@ namespace Pete.Services
                 _LastLogWriteFile = file.LastWriteTimeUtc;
                 _LastLogCreateTime = file.CreationTimeUtc;
             }
-
-            Debug.WriteLine($"[Log write time]: {_LastLogWriteFile}.{_LastLogWriteFile?.Millisecond}");
-            Debug.WriteLine($"[Log create time]: {_LastLogCreateTime}");
-
 
 #if DEBUG
             if (!App.REQUIRE_ADMIN) return;
@@ -88,8 +89,6 @@ namespace Pete.Services
                     _LastRegWrite = key.GetLastWrite();
                 }
             }
-
-            Debug.WriteLine($"[Reg key time]: {_LastRegWrite}.{_LastRegWrite?.Millisecond}");
         }
         public void GenerateWarnings()
         {
@@ -116,23 +115,11 @@ namespace Pete.Services
                 _Warnings.Add(new WarningLogWiped());
 
             bool registerDateInvalid = _RegistrationLog != null && _RegistrationLog.Date != _LastLogCreateTime;
-            bool writeInvalid = _LastLogWriteFile == null || _LastRegWrite == null || _LastLogWriteReg == null;
-            if (!writeInvalid)
-            {
-                if (_LastLogWriteFile != _LastLogWriteReg)
-                    writeInvalid = true;
-                else
-                {
-                    double timeDif = _LastRegWrite.Value.Subtract(_LastLogWriteFile.Value).TotalMilliseconds;
-                    if (Math.Abs(timeDif) >= MAXIMUM_LOG_TIME_DIFFERENCE_MS)
-                        writeInvalid = true;
-                }
-            }
+            bool writeInvalid = _LastLogWriteFile != _LastLogWriteReg || _LastRegWrite != _LastLogWriteFile || _LastLogWriteFile == null || _WasRegTypeChanged;
 
             if (registerDateInvalid || writeInvalid)
                 _Warnings.Add(new WarningLogRestored());
 
-            Debug.WriteLine($"[Activity Warnings]: {(_Warnings.Count == 0 ? "None" : _Warnings.Count.ToString("N0"))}");
             foreach (WarningBase warning in _Warnings)
                 Debug.WriteLine("  " + warning.GetType().Name);
             Debug.WriteLine("");
@@ -251,21 +238,34 @@ namespace Pete.Services
 
             }
 
-            if (_AllLogs.Count > 0)
-                Debug.WriteLine($"[Last log time]: {_AllLogs[^1].Date}.{_AllLogs[^1].Date.Millisecond}");
-
             GenerateWarnings();
         }
         public void SeenWarnings()
         {
             DateTime now = DateTime.UtcNow;
-            AddLog(new LogBase(LogType.WarningsSeen, now));
+
+            foreach(WarningBase warning in _Warnings)
+            {
+                if (warning is WarningLogRestored) _AllLogs.Add(new TamperLog(TamperType.LogRestored, now));
+                else if (warning is WarningLogWiped) _AllLogs.Add(new TamperLog(TamperType.LogWiped, now));
+            }
+
 
             _WarningSeenAt = now;
             _Warnings.Clear();
 
             if (_RegistrationLog == null)
-                Log(LogType.Register);
+            {
+                _AllLogs.Add(new LogBase(LogType.WarningsSeen, now));
+                LogBase reg = new LogBase(LogType.Register, now);
+                CheckLogType(reg);
+                AddLog(reg);
+
+                FileInfo file = new FileInfo(PATH_LOG);
+                file.CreationTimeUtc = now;
+            }
+            else
+                AddLog(new LogBase(LogType.WarningsSeen, now));
 
             HasUnseenWarning = false;
         }
@@ -354,8 +354,10 @@ namespace Pete.Services
             if (!App.REQUIRE_ADMIN) return;
 #endif
             using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\TNO\Pete", true))
+            {
                 key.SetValue("value", date.Ticks, RegistryValueKind.QWord);
-
+                key.SetLastWrite(date);
+            }
         }
         public DateTime Log(uint entryId, EntryLogType type)
         {

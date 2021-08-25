@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using Pete.Views.Login;
 using Pete.Views.Registration;
@@ -19,6 +20,7 @@ namespace Pete.Views
             RegionManager.SetRegionManager(mainRegion, manager);
 
             (App.Current as App).DecideStartScreen(manager);
+
         }
     }
 }
