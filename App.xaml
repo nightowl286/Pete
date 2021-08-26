@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Pete"
              xmlns:conv="clr-namespace:Pete.Converters"
-             xmlns:prism="http://prismlibrary.com/" >
+             xmlns:prism="http://prismlibrary.com/" 
+                        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                        Startup="PrismApplication_Startup" DispatcherUnhandledException="PrismApplication_DispatcherUnhandledException">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -84,6 +86,8 @@
                     <SolidColorBrush x:Key="Brush.Red.Shade(25)" Color="{DynamicResource Color.Red.Shade(25)}"/>
                     <SolidColorBrush x:Key="Brush.Red.Shade(50)" Color="{DynamicResource Color.Red.Shade(50)}"/>
                     <SolidColorBrush x:Key="Brush.Green" Color="{DynamicResource Color.Green}"/>
+
+                    <sys:Boolean x:Key="Dialog.ShowInTaskBar">false</sys:Boolean>
 
 
                     <DropShadowEffect x:Key="WindowShadow" Direction="315" ShadowDepth="1" Color="{DynamicResource Color.Background}"  BlurRadius="10"/>

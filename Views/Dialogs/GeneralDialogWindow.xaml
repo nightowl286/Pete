@@ -11,7 +11,7 @@
             <Setter Property="MinWidth" Value="300"/>
             <Setter Property="MinHeight" Value="200"/>
             <Setter Property="SizeToContent" Value="WidthAndHeight"/>
-            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="ShowInTaskbar" Value="{DynamicResource Dialog.ShowInTaskBar}"/>
             <Setter Property="ResizeMode" Value="NoResize"/>
             <Setter Property="Background" Value="{DynamicResource Brush.Background}"/>
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen"/>

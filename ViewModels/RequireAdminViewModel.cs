@@ -20,31 +20,7 @@ namespace Pete.ViewModels
         #endregion
         public RequireAdminViewModel()
         {
-            RestartAsAdminCommand = new DelegateCommand(RestartAsAdmin);
+            RestartAsAdminCommand = new DelegateCommand(App.RestartAsAdmin);
         }
-
-        #region Methods
-        private void RestartAsAdmin()
-        {
-            Debug.WriteLine("Attempting to restart as admin");
-            ProcessStartInfo info = new ProcessStartInfo()
-            {
-                UseShellExecute = true,
-                WorkingDirectory = Environment.CurrentDirectory,
-                FileName = Process.GetCurrentProcess().MainModule.FileName,
-                Verb = "runas"
-            };
-            try
-            {
-                Process.Start(info);
-                Environment.Exit(0);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to restart as admin. Ex: {ex.Message}");
-            }
-
-        }
-        #endregion
     }
 }

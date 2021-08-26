@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace Pete.Other
 {
-    public class ThreadedQueue
+    public class ThreadedQueue : IDisposable
     {
         #region Subclass
         private class QueueItem : IDisposable
         {
             #region Fields
             private Func<CancellationToken, Task> _Action;
-            private bool _Disposed = false;
             public CancellationTokenSource _Cancellation;
             public Task _Task;
             public CancellationToken Token => _Cancellation.Token;
@@ -50,62 +49,59 @@ namespace Pete.Other
             #region IDisposable
             public void Dispose()
             {
-                if (_Disposed) return;
-
                 _Task?.Dispose();
                 _Cancellation?.Dispose();
-                GC.SuppressFinalize(this);
-
-                _Disposed = true;
             }
             #endregion
+        }
+        private struct OwnershipToken : IDisposable
+        {
+            private ThreadedQueue _Queue;
+            public OwnershipToken(ThreadedQueue queue)
+            {
+                _Queue = queue;
+                queue.GetOwnership();
+            }
+
+            public void Dispose() => _Queue.ReleaseOwnership(); 
         }
         #endregion
 
         #region Private
         private List<QueueItem> _Scheduled;
-        private Mutex _Mutex;
+        private const int HAS_OWNERSHIP = 1;
+        private const int NO_OWNERSHIP = 0;
+        private int _Ownership;
         private Task _WorkTask;
         #endregion
         public ThreadedQueue()
         {
-            _Mutex = new Mutex();
             _Scheduled = new List<QueueItem>();
             Log("ctor");
         }
 
         #region Methods
-        public bool CancelAllThenSchedule(Func<CancellationToken, Task> action, int msTimeout = Timeout.Infinite)
+        private OwnershipToken Claim() => new OwnershipToken(this);
+        public void CancelAllThenSchedule(Func<CancellationToken, Task> action)
         {
-            if (_Mutex.WaitOne(msTimeout))
+            using (Claim())
             {
                 CancelAllCore();
                 ScheduleCore(action);
-                _Mutex.ReleaseMutex();
-                return true;
             }
-            return false;
         }
-        public bool Schedule(Func<CancellationToken, Task> action, int msTimeout = Timeout.Infinite)
+        public void Schedule(Func<CancellationToken, Task> action)
         {
-            if (_Mutex.WaitOne(msTimeout))
-            {
+            using (Claim())
                 ScheduleCore(action);
-                _Mutex.ReleaseMutex();
-                return true;
-            }
-            return false;
         }
-        public bool CancelAll(int msTimeout = Timeout.Infinite)
+        public void CancelAll()
         {
-            if (_Mutex.WaitOne(msTimeout))
-            {
+            using (Claim())
                 CancelAllCore();
-                _Mutex.ReleaseMutex();
-                return true;
-            }
-            return false;
         }
+        private bool GetOwnership() => Interlocked.CompareExchange(ref _Ownership, HAS_OWNERSHIP, NO_OWNERSHIP) == NO_OWNERSHIP;
+        private void ReleaseOwnership() => Interlocked.Exchange(ref _Ownership, NO_OWNERSHIP);
         private async Task TaskAction()
         {
             Debug.WriteLine("");
@@ -115,9 +111,9 @@ namespace Pete.Other
                 await SlowMutexWait();
                 RemoveCancelled();
 
-                if (_Scheduled.TryPeek(out QueueItem item))
+                if (TryPeek(out QueueItem item))
                 {
-                    _Mutex.ReleaseMutex();
+                    ReleaseOwnership();
                     try
                     {
                         Task task = item.PrepareTask();
@@ -131,15 +127,15 @@ namespace Pete.Other
                     }
 
                     await SlowMutexWait();
-                    _ = _Scheduled.Dequeue();
+                    _ = Dequeue();
 
                     RemoveCancelled();
 
-                    _Mutex.ReleaseMutex();
+                    ReleaseOwnership();
                 }
                 else
                 {
-                    _Mutex.ReleaseMutex();
+                    ReleaseOwnership();
                     Log("TaskAction leave");
                     return;
                 }
@@ -156,11 +152,11 @@ namespace Pete.Other
                     _Scheduled.RemoveAt(i);
             }
         }
-        private async Task SlowMutexWait(int msTimeout = 10, int msDelay = 10)
+        private async Task SlowMutexWait(int msDelay = 10)
         {
             while (true)
             {
-                if (_Mutex.WaitOne(msTimeout))
+                if (GetOwnership())
                     return;
                 await Task.Delay(msDelay);
             }
@@ -183,6 +179,30 @@ namespace Pete.Other
             Log($"Cancelling {_Scheduled.Count} task/s");
             foreach(QueueItem item in _Scheduled)
                 item.Cancel();
+        }
+        public void Dispose()
+        {
+            _WorkTask?.Dispose();
+            foreach (QueueItem item in _Scheduled)
+                item.Dispose();
+        }
+        private bool TryPeek(out QueueItem item)
+        {
+            if (_Scheduled.Count > 0)
+            {
+                item = _Scheduled[0];
+                return true;
+            }
+            item = default;
+            return false;
+        }
+        private QueueItem Dequeue()
+        {
+            if (_Scheduled.Count == 0) throw new InvalidOperationException("The collection is empty");
+
+            QueueItem item = _Scheduled[0];
+            _Scheduled.RemoveAt(0);
+            return item;
         }
         #endregion
     }

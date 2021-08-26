@@ -23,6 +23,8 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Security.Principal;
 using Microsoft.Win32;
+using System.Windows.Threading;
+using Prism.Services.Dialogs;
 
 namespace Pete
 {
@@ -36,17 +38,32 @@ namespace Pete
         public const int SLIDE_ANIMATION_INTERVAL = 15;
         public const int SLIDE_ANIMATION_INTERVAL_MINIMUM = 1; // requires at least 1 otherwise the text won't update and it will look like it froze
         public const double SLIDE_ANIMATION_INTERVAL_DECREMENT = 0.2;
+        public const bool REPORT_BUGS = true;
 #if DEBUG
         public const bool REQUIRE_ADMIN = true;
 #endif
         #endregion
 
+        #region Private
+        private IBugReporter _BugReporter;
+        private IDialogService _DialogService;
+        #endregion
+
         #region Prism
+        public static void ThrowError<T>(out string msg,out T lol, int def = SLIDE_ANIMATION_INTERVAL)
+        {
+            throw new Exception("hope this works, guess we'll see.");
+            
+        }
+
         protected override Window CreateShell()
         {
+            _BugReporter = Container.Resolve<IBugReporter>();
+            _DialogService = Container.Resolve<IDialogService>();
+
             ReloadImages();
             MakeGlobalCommands();
-            Container.Resolve<IActivityLog>();
+            _ = Container.Resolve<IActivityLog>();
 
             return Container.Resolve<MainWindow>();
         }
@@ -68,17 +85,20 @@ namespace Pete
             containerRegistry.RegisterDialog<ConfirmRemoveDialog>();
             containerRegistry.RegisterDialog<MessageDialog>();
             containerRegistry.RegisterDialog<TextInputDialog>();
+            containerRegistry.RegisterDialog<BugReportDialog>();
 
             containerRegistry.RegisterSingleton<IEncryptionModule, EncryptionModule>();
             containerRegistry.RegisterSingleton<ICategoryStore, CategoryStore>();
             containerRegistry.RegisterSingleton<ISettings, Settings>();
             containerRegistry.RegisterSingleton<IEntryStore, EntryStore>();
+            containerRegistry.RegisterSingleton<IBugReporter, BugReporter>();
             containerRegistry.RegisterSingleton<IActivityLog, Services.ActivityLog>();
             containerRegistry.Register<IIDManager, IDManager>();
         }
         #endregion
 
         #region Methods
+        
         public void DecideStartScreen(IRegionManager manager)
         {
             if (!IsAdmin())
@@ -89,10 +109,10 @@ namespace Pete
 
             IEncryptionModule encryption = Container.Resolve<IEncryptionModule>();
 
-//#if DEBUG
+#if DEBUG
             if (SkipToDashboard(manager))
                 return;
-//#endif
+#endif
 
 
             manager.RequestNavigate(RegionNames.MainRegion, encryption.HasSavedMaster() ? nameof(LoginPassword) : nameof(RegistrationPassword), DebugNavigationCallback);
@@ -132,6 +152,19 @@ namespace Pete
             bmp.EndInit();
             return bmp;
         }
+        private void ReportBug(Exception ex, object sender, Dictionary<string, string> otherData = null)
+        {
+            if (_BugReporter == null) return;
+
+            if (otherData == null) otherData = new Dictionary<string, string>();
+            if (sender != null)
+            {
+                otherData.Add("sender-type", sender.GetType().FullName);
+                otherData.Add("sender", sender.ToString());
+            }
+            string path = _BugReporter.Report(ex, otherData);
+            _DialogService.BugReport(path);
+        }
         #endregion
 
         #region Functions
@@ -161,11 +194,57 @@ namespace Pete
         }
         public static void DebugNavigationCallback(NavigationResult result)
         {
-            if (SHOW_NAVIGATION_DEBUG && result.Result == false)
-                Debug.WriteLine($"Navigating to '{result.Context.Uri}' failed, reason: {result.Error?.Message}");
+            if (result.Result == false)
+            {
+                if (SHOW_NAVIGATION_DEBUG)
+                    Debug.WriteLine($"Navigating to '{result.Context.Uri}' failed, reason: {result.Error?.Message}");
+                if (REPORT_BUGS)
+                    (App.Current as App).ReportBug(result.Error, null);
+            }
         }
-        public static void DisplayThreadId([CallerMemberName] string name = "Unknown") => Debug.WriteLine($"[{name}] Thread ID: {System.Windows.Threading.Dispatcher.CurrentDispatcher.Thread.ManagedThreadId}");
-        public static int ThreadId() => System.Windows.Threading.Dispatcher.CurrentDispatcher.Thread.ManagedThreadId;
+        public static void DisplayThreadId([CallerMemberName] string name = "Unknown") => Debug.WriteLine($"[{name}] Thread ID: {Dispatcher.CurrentDispatcher.Thread.ManagedThreadId}");
+        public static int ThreadId() => Dispatcher.CurrentDispatcher.Thread.ManagedThreadId;
+        public static void RestartAsAdmin()
+        {
+            Debug.WriteLine("Attempting to restart as admin");
+            ProcessStartInfo info = new ProcessStartInfo()
+            {
+                UseShellExecute = true,
+                WorkingDirectory = Environment.CurrentDirectory,
+                FileName = Process.GetCurrentProcess().MainModule.FileName,
+                Verb = "runas"
+            };
+            try
+            {
+                Process.Start(info);
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to restart as admin. Ex: {ex.Message}");
+                Environment.Exit(0);
+            }
+
+        }
+        public static void OpenUrl(string url) => Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true, UseShellExecute = true, WindowStyle = ProcessWindowStyle.Hidden });
         #endregion
+
+        #region Events
+        private void PrismApplication_Startup(object sender, StartupEventArgs e)
+        {
+            if (REPORT_BUGS)
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        }
+        private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            if (REPORT_BUGS)
+            {
+                e.Handled = true;
+                ReportBug(e.Exception, sender);
+            }
+        }
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) => ReportBug(e.ExceptionObject as Exception, sender);
+        #endregion
+
     }
 }

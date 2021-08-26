@@ -222,6 +222,18 @@ namespace Pete
         public static void Input(this IDialogService service, Action<ButtonResult, string> result, string title, string message, string hint, ButtonResult defaultResult = ButtonResult.None, params ButtonInfo[] buttons) => Input(service, result, title, message, hint, null, null, true, defaultResult, buttons);
         #endregion
 
+        #region Bug Report Dialog
+        public static void BugReport(this IDialogService service, string bugReportPath)
+        {
+            DialogParameters p = new DialogParameters()
+            {
+                {"path",bugReportPath }
+            };
+
+            service.ShowDialog(nameof(BugReportDialog), p, r => { }, nameof(GeneralDialogWindow));
+        }
+        #endregion
+
         #region Enum Write
         public static void WriteLogType(this IAdvancedBitWriter w, LogType type) => w.WriteNum((byte)type, 3);
         public static void WriteEntryLogType(this IAdvancedBitWriter w, EntryLogType type) => w.WriteNum((byte)type, 2);
@@ -232,24 +244,6 @@ namespace Pete
         #endregion
 
         #region Other
-        public static bool TryPeek<T>(this IList<T> collection, out T item)
-        {
-            if (collection.Count > 0)
-            {
-                item = collection[0];
-                return true;
-            }
-            item = default;
-            return false;
-        }
-        public static T Dequeue<T>(this IList<T> collection)
-        {
-            if (collection.Count == 0) throw new InvalidOperationException("The collection is empty");
-
-            T item = collection[0];
-            collection.RemoveAt(0);
-            return item;
-        }
         public static void Add(this IList<ButtonInfo> buttons, ButtonType type, object content, object parameter) => buttons.Add(new ButtonInfo(type, content, parameter));
         public static void Add(this IList<ButtonInfo> buttons, object content, object parameter) => buttons.Add(new ButtonInfo(content, parameter));
         public static void Add(this IList<ButtonInfo> buttons, object content) => buttons.Add(new ButtonInfo(content));
