@@ -26,13 +26,13 @@
             <Border Margin="15" Style="{DynamicResource Border.Card}"/>
             <Grid Margin="30,30">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="38"/>
+                    <ColumnDefinition Width="38"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="49"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="38"/>
+                    <ColumnDefinition Width="38"/>
                 </Grid.ColumnDefinitions>
                 <Button IsCancel="True" Style="{DynamicResource Button.Asset}" ToolTip="open dashboard" Content="{DynamicResource Text.Home}" Command="{Binding OpenDashboardCommand}"/>
                 <Button Grid.Column="1" Style="{DynamicResource Button.Asset}" ToolTip="add new entry" Content="{DynamicResource Text.Add}" Command="{Binding AddNewCommand}"/>
@@ -73,12 +73,12 @@
                             
                             <Grid Margin="10,10,10,5">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition Height="16"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition x:Name="colCategory" Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Title}" ToolTip="{Binding Title}" TextAlignment="Left" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" FontSize="16"/>
 

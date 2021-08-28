@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,6 +28,10 @@ namespace Pete.Resources
         private static DispatcherTimer _UpdateTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(5), IsEnabled = false };
         #endregion
 
+        #region Private
+        private bool _Subscribed;
+        #endregion
+
         #region Properties
         public int UnitCount { get => (int)GetValue(UnitCountProperty); set => SetValue(UnitCountProperty, value); }
         public bool ShowPrecise { get => (bool)GetValue(ShowPreciseProperty); set => SetValue(ShowPreciseProperty, value); }
@@ -37,19 +42,35 @@ namespace Pete.Resources
         #endregion
         public TimeDisplay()
         {
+            Unloaded += TimeDisplay_Unloaded;
             Text = "???";
             ToolTip = null;
 
             IncrementCounter();
             _UpdateTimer.Tick += _UpdateTimer_Tick;
+            _Subscribed = true;
         }
-        ~TimeDisplay()
-        {
-            DecrementCounter();
-            _UpdateTimer.Tick -= _UpdateTimer_Tick;
-        }
+        ~TimeDisplay() => Unsubscribe();
 
         #region Methods
+        private void Unsubscribe()
+        {
+            if (_Subscribed)
+            {
+                DecrementCounter();
+                _UpdateTimer.Tick -= _UpdateTimer_Tick;
+                _Subscribed = false;
+            }
+        }
+        protected override void OnVisualParentChanged(DependencyObject oldParent)
+        {
+            if (oldParent != null && Parent == null)
+            {
+                Debug.WriteLine($"TimeDisplay Parent Changed Cleanup {_InstanceCounter}");
+                Unsubscribe();
+            }
+            base.OnVisualParentChanged(oldParent);
+        }
         public void UpdateDisplay()
         {
             if (Date.HasValue)
@@ -81,6 +102,11 @@ namespace Pete.Resources
         {
             if (Date.HasValue & !RelativeDate.HasValue)
                 UpdateDisplay();
+        }
+        private void TimeDisplay_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Unsubscribe();
+            Unloaded -= TimeDisplay_Unloaded; // this shouldn't be needed as it should be on the same object
         }
         #endregion
 

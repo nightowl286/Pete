@@ -15,6 +15,7 @@ using TNO.Pete.E2fa;
 
 namespace Pete.ViewModels.Login
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class LoginPasswordViewModel : BindableBase
     {
         #region Private

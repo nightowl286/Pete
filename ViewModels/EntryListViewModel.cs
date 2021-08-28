@@ -17,6 +17,7 @@ using Pete.Other;
 
 namespace Pete.ViewModels
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class EntryListViewModel : BindableBase, INavigationAware
     {
         #region Private
@@ -86,7 +87,7 @@ namespace Pete.ViewModels
         #region Events
         private void FilterCategoryChanged()
         {
-            if (!_ReactToSelectionChanged) return;
+            if (!_ReactToSelectionChanged || _FilterCategoryIndex == -1) return;
 
 
             _DisplayThread.CancelAllThenSchedule(PerformFilter);
@@ -188,6 +189,10 @@ namespace Pete.ViewModels
         {
             _DisplayThread.CancelAll();
             _DisplayThread = null;
+            _Categories.Clear();
+            _Categories = null;
+            _Entries.Clear();
+            _Entries = null;
         }
         public void OnNavigatedTo(NavigationContext navigationContext) { }
         #endregion

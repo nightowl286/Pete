@@ -17,6 +17,7 @@ using Microsoft.Win32;
 
 namespace Pete.ViewModels.Registration
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class RegistrationUsbViewModel : BindableBase, INavigationAware
     {
         #region Consts

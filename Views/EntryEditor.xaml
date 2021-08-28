@@ -19,10 +19,10 @@
         <Border Margin="15" Style="{DynamicResource Border.Card}"/>
         <Grid Margin="30,30">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="15"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="38"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -134,16 +134,16 @@
                         </Style>
                     </Grid.Resources>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="36"/>
+                        <RowDefinition Height="36"/>
+                        <RowDefinition Height="36"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="39"/>
                         <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    </Grid.ColumnDefinitions>       
                     <TextBlock Style="{DynamicResource TextBlock.Icon}" ToolTip="last viewed" Text="{DynamicResource Text.Eye}"/>
                     <TextBlock Style="{DynamicResource TextBlock.Icon}" Grid.Row="1"  ToolTip="last edited" Text="{DynamicResource Text.Wrench}"/>
                     <TextBlock Style="{DynamicResource TextBlock.Icon}" Grid.Row="2" ToolTip="first created" Text="{DynamicResource Text.Pen}"/>
@@ -163,9 +163,9 @@
                             </Style>
                         </Grid.Style>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="22"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="37"/>
                         </Grid.RowDefinitions>
                         
                         <Border Grid.RowSpan="3" Background="{DynamicResource Brush.Background.Tint(2)}" CornerRadius="5"/>

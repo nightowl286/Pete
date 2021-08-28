@@ -23,6 +23,7 @@ using Pete.Other;
 
 namespace Pete.ViewModels
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class ActivityLogViewModel : BindableBase, INavigationAware
     {
 
@@ -261,7 +262,14 @@ namespace Pete.ViewModels
             Debug.WriteLine($"[FilterLogs] ended natural | token {cancelToken.GetHashCode():x2}");
         }
         public bool IsNavigationTarget(NavigationContext navigationContext) => false;
-        public void OnNavigatedFrom(NavigationContext navigationContext) => Unsubscribe();
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            Unsubscribe();
+            _DisplayLogs.Clear();
+            _DisplayLogs = null;
+            _AllLogs = null;
+
+        }
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             Subscribe();

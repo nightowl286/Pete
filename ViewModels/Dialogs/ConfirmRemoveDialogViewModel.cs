@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 
 namespace Pete.ViewModels.Dialogs
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class ConfirmRemoveDialogViewModel : BindableBase, IDialogAware
     {
         #region Private

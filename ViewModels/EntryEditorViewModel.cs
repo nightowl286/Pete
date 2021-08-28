@@ -21,6 +21,7 @@ using Prism.Services.Dialogs;
 
 namespace Pete.ViewModels
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class EntryEditorViewModel : BindableBase, INavigationAware
     {
         #region Consts

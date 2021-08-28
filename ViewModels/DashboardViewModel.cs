@@ -13,6 +13,7 @@ using System.ComponentModel;
 
 namespace Pete.ViewModels
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class DashboardViewModel : BindableBase, INavigationAware
     {
         #region Private
@@ -41,6 +42,7 @@ namespace Pete.ViewModels
         #endregion
         public DashboardViewModel(IRegionManager regionManager, IEntryStore entryStore, IDialogService dialogService, ICategoryStore categoryStore, IActivityLog activityLog, ISettings settings)
         {
+
             ActivityWarning = activityLog.HasUnseenWarning;
 
             _ActivityLog = activityLog;
@@ -50,7 +52,6 @@ namespace Pete.ViewModels
             _CategoryStore = categoryStore;
             _Settings = settings;
             settings.Load();
-
             //(settings.Encryption as Pete.Services.EncryptionModule).SaveDebug();
 
             AddNewCommand = new DelegateCommand(AddNewCallback, () => !ActivityWarning).ObservesProperty(() => ActivityWarning);

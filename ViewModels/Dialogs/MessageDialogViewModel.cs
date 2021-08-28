@@ -5,10 +5,12 @@ using System.Linq;
 using Pete.Models;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 
 namespace Pete.ViewModels.Dialogs
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class MessageDialogViewModel : BindableBase, IDialogAware
     {
         #region Private

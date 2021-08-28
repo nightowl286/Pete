@@ -46,10 +46,17 @@ namespace Pete
         }
         public TextboxHint()
         {
+            Unloaded += TextboxHint_Unloaded;
             TextChanged += TextboxHint_TextChanged;
         }
 
+
         #region Events
+        private void TextboxHint_Unloaded(object sender, RoutedEventArgs e)
+        {
+            TextChanged -= TextboxHint_TextChanged;
+            Unloaded -= TextboxHint_Unloaded;
+        }
         private void TextboxHint_TextChanged(object sender, TextChangedEventArgs e) => HintVisibility = string.IsNullOrEmpty(Text) ? Visibility.Visible : Visibility.Hidden;
         #endregion
     }

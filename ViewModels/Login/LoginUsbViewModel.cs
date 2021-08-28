@@ -14,6 +14,7 @@ using TNO.Pete.E2fa.UsbHasher;
 
 namespace Pete.ViewModels.Login
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class LoginUsbViewModel : BindableBase, INavigationAware
     {
         #region Consts

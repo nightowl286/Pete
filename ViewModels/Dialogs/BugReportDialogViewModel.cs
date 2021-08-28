@@ -8,18 +8,20 @@ using System.Linq;
 using System.Windows;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 
 namespace Pete.ViewModels.Dialogs
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class BugReportDialogViewModel : BindableBase, IDialogAware
     {
         #region Private
         private readonly string[] _Emojis = new string[]
         {
-            "(。_。)", "(⊙_⊙)？", "＼（〇_ｏ）／",
-            "(￣m￣）", "o_o", "(•ˋ _ ˊ•)", "(●__●)",
-            "U_U", "X_X", "T_T", "O_O", "~_~", "-_-", "=_=",
+            "(。_。)", "＼（〇_ｏ）／","￣へ￣","┻━┻ ︵ ＼( °□° )／ ︵ ┻━┻","ಠ_ಠ","(ノ｀Д)ノ","(╯▔皿▔)╯",
+            "(￣m￣）", "o_o", "(•ˋ _ ˊ•)", "(●__●)","(⓿_⓿)","(►__◄)","┗|｀O′|┛",@"¯\(°_o)/¯","(x_x)",
+            "U_U", "X_X", "T_T", "O_O", "~_~", "-_-", "=_=","(╯°□°）╯︵ ┻━┻",
         };
         private string _Emoji;
         private string _FullPath;

@@ -16,7 +16,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Message}" MaxWidth="300" TextAlignment="Center" FontSize="14" Foreground="{DynamicResource Brush.Text}" TextWrapping="Wrap">
                 <TextBlock.RenderTransform>
-                    <TranslateTransform Y="{Binding RelativeSource={RelativeSource AncestorType=TextBlock}, Path=ActualHeight, Converter={StaticResource FirstDegreeFunction}, ConverterParameter=-1|-100}"/>
+                    <TranslateTransform Y="{Binding RelativeSource={RelativeSource AncestorType=TextBlock}, Path=ActualHeight, Mode=OneTime, Converter={StaticResource FirstDegreeFunction}, ConverterParameter=-1|-100}"/>
                 </TextBlock.RenderTransform>
                 <TextBlock.Triggers>
                     <EventTrigger RoutedEvent="Loaded">

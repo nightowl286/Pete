@@ -20,7 +20,7 @@
                 </Style>
             </Grid.Style>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="98"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid>
@@ -197,12 +197,11 @@
                                 <Border Style="{DynamicResource Border.Card}"/>
                                 <Grid Margin="7">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        
                                     <TextBlock Text="{Binding EntryName}" VerticalAlignment="Center" ToolTip="{Binding EntryName}" MaxWidth="120" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap">
                                         <TextBlock.Style>
                                             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlock.Main}">
@@ -215,9 +214,9 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <Border Grid.Column="1" Style="{DynamicResource Border.Divider.Vertical}" Margin="5,0"/>
+                                    <Border Style="{DynamicResource Border.Divider.Vertical}" Margin="5,0"/>
 
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <StackPanel Orientation="Horizontal">
                                         <StackPanel.Style>
                                             <Style TargetType="{x:Type StackPanel}">
                                                 <Style.Triggers>
@@ -233,7 +232,8 @@
                                         <Border Style="{DynamicResource Border.Divider.Vertical}" Margin="5,0"/>
                                     </StackPanel>
 
-                                    <TextBlock Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Grid.Column="3" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Text="{Binding Text}" ToolTip="{Binding Text}" VerticalAlignment="Center"/>
+                                    <TextBlock Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Text="{Binding Text}" ToolTip="{Binding Text}" VerticalAlignment="Center"/>
+                                    </StackPanel>
 
                                     <resources:TimeDisplay Grid.Column="4" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
                                 </Grid>
@@ -253,11 +253,11 @@
                                 <Grid Margin="7">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Text}" ToolTip="{Binding Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                    <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
+                                    <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
@@ -279,11 +279,11 @@
                                 <Grid Margin="7">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Style="{DynamicResource TextBlock.Main}" Text="{Binding Text}" ToolTip="{Binding Text}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                    <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago"/>
+                                    <resources:TimeDisplay Grid.Column="1" Date="{Binding Date}" Style="{DynamicResource TextBlock.Main}" VerticalAlignment="Center" Margin="10,0,0,0" UnitCount="2" Postfix=" ago" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Grid>
                         </DataTemplate>

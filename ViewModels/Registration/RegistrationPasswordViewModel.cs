@@ -9,6 +9,7 @@ using Prism.Regions;
 
 namespace Pete.ViewModels.Registration
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class RegistrationPasswordViewModel : BindableBase
     {
         #region Private

@@ -12,6 +12,7 @@ using Pete.Models;
 
 namespace Pete.ViewModels
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class SettingsViewModel : BindableBase, INavigationAware
     {
         #region Private

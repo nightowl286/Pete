@@ -10,6 +10,7 @@ using WorkTask = System.Threading.Tasks.Task;
 
 namespace Pete.ViewModels
 {
+    [RegionMemberLifetime(KeepAlive = false)]
     public class TaskScreenViewModel : BindableBase, INavigationAware, IJournalAware
     {
         #region Private
