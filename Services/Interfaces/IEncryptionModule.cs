@@ -22,9 +22,11 @@ namespace Pete.Services.Interfaces
         byte[] AesKey { get; }
         byte[] AesSalt { get; }
         string Id2FA { get; }*/
+        event Action ReencryptionNeeded;
         #endregion
 
         #region Methods
+        void RegenerateKey();
         bool HasSavedDevice();
         bool HasSavedMaster();
         bool CheckMaster(string master);

@@ -31,17 +31,16 @@ namespace Pete.Services
         private LogBase _RegistrationLog;
         private DateTime? _WarningSeenAt;
         private DateTime? _LastCleanup;
-        private Dictionary<uint, List<EntryLog>> _EntryLogs;
-        private List<LogBase> _AllLogs;
+        private readonly Dictionary<uint, List<EntryLog>> _EntryLogs;
+        private readonly List<LogBase> _AllLogs;
         private readonly IEncryptionModule _EncryptionModule;
         private DateTime? _LastLogWriteReg;
         private DateTime? _LastLogWriteFile;
         private DateTime? _LastLogCreateTime;
         private DateTime? _LastRegWrite;
         private bool _WasRegTypeChanged;
-        private bool _WasLogTampered;
         private LogBase _LastLog;
-        private ObservableCollection<WarningBase> _Warnings = new ObservableCollection<WarningBase>();
+        private readonly ObservableCollection<WarningBase> _Warnings = new ObservableCollection<WarningBase>();
         #endregion
 
         #region Properties
@@ -64,6 +63,23 @@ namespace Pete.Services
         {
 
         }
+        public void AddFirstRegistration()
+        {
+            DateTime now = DateTime.UtcNow;
+            LogBase register = new LogBase(LogType.Register, now);
+
+            CheckLogType(register);
+            AddLog(register);
+
+            _LastLogCreateTime = now;
+            _LastLogWriteFile = now;
+            _LastLogWriteReg = now;
+            _LastRegWrite = now;
+            _WasRegTypeChanged = false;
+
+            _Warnings.Clear();
+            HasUnseenWarning = false;
+        }
         private void LoadLastLogDate()
         {
             if (File.Exists(PATH_LOG))
@@ -74,20 +90,20 @@ namespace Pete.Services
             }
 
 #if DEBUG
+#pragma warning disable CS0162 // Unreachable code detected
             if (!App.REQUIRE_ADMIN) return;
+#pragma warning restore CS0162 // Unreachable code detected
 #endif
-            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\TNO\Pete", false))
+            using RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\TNO\Pete", false);
+            if (key != null)
             {
-                if (key != null)
-                {
-                    object got = key.GetValue("value", null);
-                    if (got is long gotLong)
-                        _LastLogWriteReg = new DateTime(gotLong);
-                    else if (got != null)
-                        _WasRegTypeChanged = true;
+                object got = key.GetValue("value", null);
+                if (got is long gotLong)
+                    _LastLogWriteReg = new DateTime(gotLong);
+                else if (got != null)
+                    _WasRegTypeChanged = true;
 
-                    _LastRegWrite = key.GetLastWrite();
-                }
+                _LastRegWrite = key.GetLastWrite();
             }
         }
         public void GenerateWarnings()
@@ -261,8 +277,7 @@ namespace Pete.Services
                 CheckLogType(reg);
                 AddLog(reg);
 
-                FileInfo file = new FileInfo(PATH_LOG);
-                file.CreationTimeUtc = now;
+                new FileInfo(PATH_LOG) { CreationTimeUtc = now };
             }
             else
                 AddLog(new LogBase(LogType.WarningsSeen, now));
@@ -345,19 +360,18 @@ namespace Pete.Services
 
             Save();
 
-            FileInfo info = new FileInfo(PATH_LOG);
-            info.LastWriteTimeUtc = date;
+            FileInfo info = new FileInfo(PATH_LOG) { LastWriteTimeUtc = date };
             if (log.Type == LogType.Register)
                 info.CreationTimeUtc = date;
 
 #if DEBUG
+#pragma warning disable CS0162 // Unreachable code detected
             if (!App.REQUIRE_ADMIN) return;
+#pragma warning restore CS0162 // Unreachable code detected
 #endif
-            using (RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\TNO\Pete", true))
-            {
-                key.SetValue("value", date.Ticks, RegistryValueKind.QWord);
-                key.SetLastWrite(date);
-            }
+            using RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\TNO\Pete", true);
+            key.SetValue("value", date.Ticks, RegistryValueKind.QWord);
+            key.SetLastWrite(date);
         }
         public DateTime Log(uint entryId, EntryLogType type)
         {

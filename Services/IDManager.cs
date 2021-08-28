@@ -62,7 +62,7 @@ namespace Pete.Services
         public void CleanFree()
         {
             while (FreedIDs.Contains(NextID - 1))
-                FreedIDs.Remove(NextID--);
+                FreedIDs.Remove(--NextID);
         }
         private void CheckToken(ReservationToken<uint> token)
         {

@@ -19,6 +19,7 @@ namespace Pete.Services.Interfaces
         #endregion
 
         #region Methods
+        void AddFirstRegistration();
         void RunCleanup();
         void GenerateWarnings();
         IEnumerable<LogBase> GetAll();

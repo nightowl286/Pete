@@ -25,7 +25,7 @@
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.RenderTransform>
-                    <TranslateTransform Y="-200"/>
+                    <TranslateTransform Y="-250"/>
                 </Grid.RenderTransform>
                 <Grid.Triggers>
                     <EventTrigger RoutedEvent="Loaded">
@@ -43,6 +43,8 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button ToolTip="go back" Content="{DynamicResource Text.Arrow.Left}" Command="{Binding GoBackCommand}">
                         <Button.Style>
@@ -61,7 +63,9 @@
 
                     <TextBlock Grid.Column="2" Style="{DynamicResource TextBlock.Main}" TextAlignment="Left" Margin="5,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{Binding LogCountText}" ToolTip="{Binding LogCountText}"/>
 
-                    <Grid Grid.Column="3">
+                    <Button Grid.Column="4" Style="{DynamicResource Button.Asset}" Content="{DynamicResource Text.Broom}" IsEnabled="False" ToolTip="functionality not yet available" ToolTipService.ShowOnDisabled="True"/>
+
+                    <Grid Grid.Column="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>

@@ -98,8 +98,7 @@ namespace Pete
 
             public static IShellFolder SHGetDesktopFolder()
             {
-                IShellFolder result;
-                Marshal.ThrowExceptionForHR(SHGetDesktopFolder_(out result));
+                Marshal.ThrowExceptionForHR(SHGetDesktopFolder_(out IShellFolder result));
                 return result;
             }
 
@@ -121,10 +120,8 @@ namespace Pete
 
         static IntPtr GetShellFolderChildrenRelativePIDL(IShellFolder parentFolder, string displayName)
         {
-            uint pchEaten;
             uint pdwAttributes = 0;
-            IntPtr ppidl;
-            parentFolder.ParseDisplayName(IntPtr.Zero, null, displayName, out pchEaten, out ppidl, ref pdwAttributes);
+            parentFolder.ParseDisplayName(IntPtr.Zero, null, displayName, out _, out IntPtr ppidl, ref pdwAttributes);
 
             return ppidl;
         }
@@ -139,8 +136,7 @@ namespace Pete
 
         static IShellFolder PIDLToShellFolder(IShellFolder parent, IntPtr pidl)
         {
-            IShellFolder folder;
-            var result = parent.BindToObject(pidl, null, ref IID_IShellFolder, out folder);
+            var result = parent.BindToObject(pidl, null, ref IID_IShellFolder, out IShellFolder folder);
             Marshal.ThrowExceptionForHR((int)result);
             return folder;
         }

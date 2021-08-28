@@ -8,11 +8,16 @@ namespace Pete.Services.Interfaces
 {
     public interface ISettings : INotifyPropertyChanged
     {
+        #region Consts
+        public const int DEF_ITER = 3_000_000;
+        public const int DEF_SALT = 10240;
+        #endregion
+
         #region Properties
-        int Iterations { get; }
-        int SaltSize { get; }
+        int Iterations { get; set; }
+        int SaltSize { get; set; }
         IEncryptionModule Encryption { get; set; }
-        bool ShowEntryListAtStart { get; }
+        bool ShowEntryListAtStart { get; set; }
         ObservableCollection<bool> LogFilters { get; }
         ObservableCollection<bool> LogEntryFilters { get; }
         #endregion

@@ -17,9 +17,9 @@
         <KeyBinding Key="F3" Command="{Binding ActivityLogCommand}"/>
         <KeyBinding Key="D3" Command="{Binding ActivityLogCommand}"/>
 
-        <KeyBinding Key="NumPad4" />
-        <KeyBinding Key="F4"/>
-        <KeyBinding Key="D4"/>
+        <KeyBinding Key="NumPad4" Command="{Binding SettingsCommand}"/>
+        <KeyBinding Key="F4" Command="{Binding SettingsCommand}"/>
+        <KeyBinding Key="D4" Command="{Binding SettingsCommand}"/>
     </UserControl.InputBindings>
     <UserControl.Resources>
         <Storyboard x:Key="Storyboard.MoveIn" FillBehavior="HoldEnd">

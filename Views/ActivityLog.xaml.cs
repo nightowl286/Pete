@@ -22,7 +22,7 @@ namespace Pete.Views
             Point xy = new Point(0.5d * (ButtonFilter.ActualWidth - popupSize.Width) ,0);
             xy.Offset(offset.X, offset.Y);
             CustomPopupPlacement vertical = new CustomPopupPlacement(xy, PopupPrimaryAxis.Vertical);
-            CustomPopupPlacement horizontal = new CustomPopupPlacement(xy, PopupPrimaryAxis.Vertical);
+            CustomPopupPlacement horizontal = new CustomPopupPlacement(xy, PopupPrimaryAxis.Horizontal);
 
             return new CustomPopupPlacement[] { vertical, horizontal };
 

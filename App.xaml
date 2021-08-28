@@ -44,7 +44,7 @@
                     <Color x:Key="Color.Red.Tint(10)">#b54e4e</Color>
                     <Color x:Key="Color.Green">#3bad3b</Color>
 
-                    <Color x:Key="Color.Link">#1e5a99</Color>
+                    <Color x:Key="Color.Link">#2570bf</Color>
                     <Color x:Key="Color.Link.Tint(25)">#4d96e2</Color>
                     <Color x:Key="Color.Link.Shade(25)">#164372</Color>
 
@@ -127,22 +127,7 @@
                         <Image Source="{DynamicResource logo}" Margin="3" RenderOptions.EdgeMode="Aliased" RenderOptions.ClearTypeHint="Enabled" RenderOptions.BitmapScalingMode="HighQuality"/>
                     </Grid>
 
-                    <Style x:Key="Border.Card" TargetType="{x:Type Border}">
-                        <Setter Property="Background" Value="{DynamicResource Brush.Background.Tint(3.88)}"/>
-                        <Setter Property="Effect" Value="{DynamicResource SmallShadow}"/>
-                        <Setter Property="CornerRadius" Value="5"/>
-                    </Style>
-
-                    <Style x:Key="Border.Divider.Horizontal" TargetType="{x:Type Border}">
-                        <Setter Property="Height" Value="2"/>
-                        <Setter Property="Background" Value="{DynamicResource Brush.Text.Shade(25)}"/>
-                        <Setter Property="CornerRadius" Value="1"/>
-                        <Setter Property="Effect" Value="{DynamicResource SmallShadow}"/>
-                    </Style>
-                    <Style x:Key="Border.Divider.Vertical" TargetType="{x:Type Border}" BasedOn="{StaticResource Border.Divider.Horizontal}">
-                        <Setter Property="Height" Value="NaN"/>
-                        <Setter Property="Width" Value="2"/>
-                    </Style>
+                    
 
                     <Style x:Key="Focus.Main">
                         <Setter Property="Control.Template">
@@ -186,6 +171,7 @@
                 <ResourceDictionary Source="Resources/TextBoxes.xaml"/>
                 <ResourceDictionary Source="Resources/ComboBoxes.xaml"/>
                 <ResourceDictionary Source="Resources/CheckBoxes.xaml"/>
+                <ResourceDictionary Source="Resources/Borders.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

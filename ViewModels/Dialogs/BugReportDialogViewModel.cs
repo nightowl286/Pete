@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -25,12 +26,12 @@ namespace Pete.ViewModels.Dialogs
         private string _FileName;
         private string _FolderPath;
         private string _FolderName;
-        private string _GithubLink = @"https://github.com/nightowl286";
-        private DelegateCommand _OpenGithubCommand;
         private DelegateCommand _RestartCommand;
         private DelegateCommand<string> _OpenCommand;
-        Random _rnd = new Random();
+        private readonly Random _rnd = new Random();
+#pragma warning disable CS0067
         public event Action<IDialogResult> RequestClose;
+#pragma warning restore CS0067
         #endregion
 
         #region Properties
@@ -39,8 +40,6 @@ namespace Pete.ViewModels.Dialogs
         public string FileName { get => _FileName; private set => SetProperty(ref _FileName, value); }
         public string FolderPath { get => _FolderPath; private set => SetProperty(ref _FolderPath, value); }
         public string FolderName { get => _FolderName; private set => SetProperty(ref _FolderName, value); }
-        public string GithubLink { get => _GithubLink; private set => SetProperty(ref _GithubLink, value); }
-        public DelegateCommand OpenGithubCommand { get => _OpenGithubCommand; private set => SetProperty(ref _OpenGithubCommand, value); }
         public DelegateCommand RestartCommand { get => _RestartCommand; private set => SetProperty(ref _RestartCommand, value); }
         public DelegateCommand<string> OpenCommand { get => _OpenCommand; private set => SetProperty(ref _OpenCommand, value); }
         public string Title => "Pete | Bug encountered";
@@ -48,7 +47,6 @@ namespace Pete.ViewModels.Dialogs
         public BugReportDialogViewModel()
         {
             RestartCommand = new DelegateCommand(App.RestartAsAdmin);
-            OpenGithubCommand = new DelegateCommand(() => App.OpenUrl(GithubLink));
             OpenCommand = new DelegateCommand<string>(OpenCallback);
         }
 

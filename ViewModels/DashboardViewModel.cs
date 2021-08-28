@@ -16,6 +16,7 @@ namespace Pete.ViewModels
     public class DashboardViewModel : BindableBase, INavigationAware
     {
         #region Private
+        private static bool _NavigatedOnStartup = false;
         private bool _ActivityWarning;
         private readonly IRegionManager _RegionManager;
         private readonly IEntryStore _EntryStore;
@@ -50,9 +51,11 @@ namespace Pete.ViewModels
             _Settings = settings;
             settings.Load();
 
+            //(settings.Encryption as Pete.Services.EncryptionModule).SaveDebug();
+
             AddNewCommand = new DelegateCommand(AddNewCallback, () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
             ShowAllCommand = new DelegateCommand(() => NavigateTo(nameof(EntryList)), () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
-            SettingsCommand = new DelegateCommand(() => { }, () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
+            SettingsCommand = new DelegateCommand(() => NavigateTo(nameof(Settings)), () => !ActivityWarning).ObservesProperty(() => ActivityWarning);
             ActivityLogCommand = new DelegateCommand(() => NavigateTo(nameof(ActivityLog)));
 
             LoadedCommand = new DelegateCommand(CheckMissingCategories);
@@ -109,7 +112,12 @@ namespace Pete.ViewModels
                 { "token", _EntryStore.GetNewID() }
             });
         }
-        public void OnNavigatedTo(NavigationContext navigationContext) { }
+        public void OnNavigatedTo(NavigationContext navigationContext)
+{
+            if (!ActivityWarning && _Settings.ShowEntryListAtStart && !_NavigatedOnStartup)
+                NavigateTo(nameof(EntryList));
+            _NavigatedOnStartup = true;
+        }
         public bool IsNavigationTarget(NavigationContext navigationContext) => false;
         public void OnNavigatedFrom(NavigationContext navigationContext) { }
         #endregion

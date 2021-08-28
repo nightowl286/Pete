@@ -36,7 +36,7 @@ namespace Pete.Services
         private byte[] _DeviceID;
         private byte[] _DeviceHash;
         private readonly ISettings _Settings;
-        private int _LastIterSize;
+        public event Action ReencryptionNeeded;
         #endregion
 
         #region Properties
@@ -70,40 +70,37 @@ namespace Pete.Services
                 Debug.WriteLine($"[EncryptionModule] debug data not found");
                 return false;
             }
-            using (FileStream fs = new FileStream(PATH_DEBUG, FileMode.Open))
-            {
-                AdvancedBitReader r = new AdvancedBitReader(fs);
+            using FileStream fs = new FileStream(PATH_DEBUG, FileMode.Open);
+            AdvancedBitReader r = new AdvancedBitReader(fs);
 
-                _DeviceID = r.ReadBytes(256);
-                _DeviceHash = r.ReadBytes(256);
-                _AesKey = r.ReadBytes(256);
-                _MasterKey = r.ReadBytes(256);
-                _FAKey = r.ReadBytes(256);
-                Device2FA = new DriveInfo(r.ReadString(Encoding.UTF8));
+            _DeviceID = r.ReadBytes(256);
+            _DeviceHash = r.ReadBytes(256);
+            _AesKey = r.ReadBytes(256);
+            _MasterKey = r.ReadBytes(256);
+            _FAKey = r.ReadBytes(256);
+            Device2FA = new DriveInfo(r.ReadString(Encoding.UTF8));
 
-                Debug.WriteLine($"[EncryptionModule] debug data loaded");
-                return true;
-            }
+            Debug.WriteLine($"[EncryptionModule] debug data loaded");
+            return true;
         }
         public void SaveDebug()
         {
             EnsurePath();
-            using (FileStream fs = new FileStream(PATH_DEBUG, FileMode.OpenOrCreate))
-            {
-                AdvancedBitWriter w = new AdvancedBitWriter(fs);
+            using FileStream fs = new FileStream(PATH_DEBUG, FileMode.OpenOrCreate);
+            AdvancedBitWriter w = new AdvancedBitWriter(fs);
 
-                w.WriteBytes(_DeviceID);
-                w.WriteBytes(_DeviceHash);
-                w.WriteBytes(_AesKey);
-                w.WriteBytes(_MasterKey);
-                w.WriteBytes(_FAKey);
-                w.WriteString(Device2FA.Name, Encoding.UTF8);
+            w.WriteBytes(_DeviceID);
+            w.WriteBytes(_DeviceHash);
+            w.WriteBytes(_AesKey);
+            w.WriteBytes(_MasterKey);
+            w.WriteBytes(_FAKey);
+            w.WriteString(Device2FA.Name, Encoding.UTF8);
 
-                w.Flush();
-                w.Dispose();
-            }
+            w.Flush();
+            w.Dispose();
         }
 #endif
+        public void RegenerateKey() => throw new NotImplementedException();
         public bool HasSavedDevice() => File.Exists(PATH_HASH_USB);
         public bool HasSavedMaster() => File.Exists(PATH_HASH_MASTER);
         public bool CheckMaster(string master)
@@ -131,7 +128,6 @@ namespace Pete.Services
             if (PBKDF2.SameHash(savedHash, generatedHash))
             {
                 _MasterSalt = savedSalt;
-                _LastIterSize = iter;
                 _MasterKey = generatedKey;
                 _MasterHash = generatedHash;
 
@@ -152,17 +148,15 @@ namespace Pete.Services
             _MasterKey = PBKDF2.Derive(_MasterData, _MasterSalt, iter, 32, HashAlgorithmName.SHA512);
             _MasterHash = PBKDF2.QuickSha512Hash(_MasterKey);
 
-            using (FileStream fs = new FileStream(PATH_HASH_MASTER, FileMode.OpenOrCreate))
-            {
-                AdvancedBitWriter w = new AdvancedBitWriter(fs);
-                w.Write(saltSize);
-                w.Write(iter);
-                w.WriteBytes(_MasterSalt);
-                w.WriteBytes(_MasterHash);
+            using FileStream fs = new FileStream(PATH_HASH_MASTER, FileMode.OpenOrCreate);
+            AdvancedBitWriter w = new AdvancedBitWriter(fs);
+            w.Write(saltSize);
+            w.Write(iter);
+            w.WriteBytes(_MasterSalt);
+            w.WriteBytes(_MasterHash);
 
-                w.Flush();
-                w.Dispose();
-            }
+            w.Flush();
+            w.Dispose();
         }
         public bool LoadFAKey()
         {
@@ -217,17 +211,14 @@ namespace Pete.Services
             byte[] encryptedData = File.ReadAllBytes(PATH_KEY);
             byte[] data = AES.Decrypt(encryptedData, _MasterKey);
 
-            using (MemoryStream ms = new MemoryStream(data))
-            {
-                AdvancedBitReader r = new AdvancedBitReader(ms);
+            using MemoryStream ms = new MemoryStream(data);
+            AdvancedBitReader r = new AdvancedBitReader(ms);
 
-                int saltSize = r.Read<int>();
-                int iter = r.Read<int>();
-                _AesSalt = r.ReadBytes((ulong)saltSize * 8UL);
+            int saltSize = r.Read<int>();
+            int iter = r.Read<int>();
+            _AesSalt = r.ReadBytes((ulong)saltSize * 8UL);
 
-                _AesKey = PBKDF2.Derive(key, _AesSalt, iter, 32, HashAlgorithmName.SHA512);
-                
-            }
+            _AesKey = PBKDF2.Derive(key, _AesSalt, iter, 32, HashAlgorithmName.SHA512);
 
         }
         public void GenerateAesKey()
@@ -244,22 +235,19 @@ namespace Pete.Services
             _AesKey = PBKDF2.Derive(key, _AesSalt, iter, 32, HashAlgorithmName.SHA512);
 
             EnsurePath();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                AdvancedBitWriter w = new AdvancedBitWriter(ms);
-                w.Write(saltSize);
-                w.Write(iter);
-                w.WriteBytes(_AesSalt);
+            using MemoryStream ms = new MemoryStream();
+            AdvancedBitWriter w = new AdvancedBitWriter(ms);
+            w.Write(saltSize);
+            w.Write(iter);
+            w.WriteBytes(_AesSalt);
 
-                w.Flush();
-                w.Dispose();
+            w.Flush();
+            w.Dispose();
 
-                byte[] data = ms.ToArray();
-                byte[] encrypted = AES.Encrypt(data, _MasterKey);
+            byte[] data = ms.ToArray();
+            byte[] encrypted = AES.Encrypt(data, _MasterKey);
 
-                File.WriteAllBytes(PATH_KEY, encrypted);
-                
-            }
+            File.WriteAllBytes(PATH_KEY, encrypted);
         }
         public void Generate2FAKey()
         {
@@ -271,17 +259,15 @@ namespace Pete.Services
             _FAKeyHash = PBKDF2.QuickSha512Hash(_FAKey);
 
             EnsurePath();
-            using (FileStream fs = new FileStream(PATH_HASH_2FA, FileMode.OpenOrCreate))
-            {
-                AdvancedBitWriter w = new AdvancedBitWriter(fs);
-                w.Write(saltSize);
-                w.Write(iter);
-                w.WriteBytes(salt);
-                w.WriteBytes(_FAKeyHash);
+            using FileStream fs = new FileStream(PATH_HASH_2FA, FileMode.OpenOrCreate);
+            AdvancedBitWriter w = new AdvancedBitWriter(fs);
+            w.Write(saltSize);
+            w.Write(iter);
+            w.WriteBytes(salt);
+            w.WriteBytes(_FAKeyHash);
 
-                w.Flush();
-                w.Dispose();
-            }
+            w.Flush();
+            w.Dispose();
         }
         public void SetMaster(string master)
         {

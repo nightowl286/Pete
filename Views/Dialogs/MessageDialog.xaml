@@ -5,7 +5,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:models="clr-namespace:Pete.Models">
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Border Margin="15" Style="{DynamicResource Border.Card}"/>
+        <Border Margin="15" Style="{DynamicResource Border.Card}"/>
         <Grid Margin="30,30">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -14,14 +14,50 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Message}" MaxWidth="300" TextAlignment="Center" FontSize="14" Foreground="{DynamicResource Brush.Text}" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding Message}" MaxWidth="300" TextAlignment="Center" FontSize="14" Foreground="{DynamicResource Brush.Text}" TextWrapping="Wrap">
+                <TextBlock.RenderTransform>
+                    <TranslateTransform Y="{Binding RelativeSource={RelativeSource AncestorType=TextBlock}, Path=ActualHeight, Converter={StaticResource FirstDegreeFunction}, ConverterParameter=-1|-100}"/>
+                </TextBlock.RenderTransform>
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(FrameworkElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.25" DecelerationRatio="0.2"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(FrameworkElement.Opacity)" To="1" From="0" Duration="0:0:0.45" DecelerationRatio="0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CircleEase EasingMode="EaseIn"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
             <ItemsControl Grid.Row="1" Focusable="False" HorizontalAlignment="Center" Margin="0,15,0,0" ItemsSource="{Binding Buttons}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal">
                             <StackPanel.Resources>
                                 <DataTemplate DataType="{x:Type models:ButtonInfo}">
-                                    <Button x:Name="Button" Content="{Binding Content}" Style="{DynamicResource Button.Base}" IsCancel="{Binding IsCancel}" Command="{Binding Path=DataContext.GotResultCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" Margin="7, 3"/>
+                                    <Button x:Name="Button" Content="{Binding Content}" Style="{DynamicResource Button.Base}" IsCancel="{Binding IsCancel}" Command="{Binding Path=DataContext.GotResultCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" Margin="7, 3">
+                                        <Button.RenderTransform>
+                                            <TranslateTransform Y="100"/>
+                                        </Button.RenderTransform>
+                                        <Button.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="(FrameworkElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.25" DecelerationRatio="0.2" BeginTime="0:0:0.25"/>
+                                                        <DoubleAnimation Storyboard.TargetProperty="(FrameworkElement.Opacity)" To="1" From="0" Duration="0:0:0.45" DecelerationRatio="0.2" BeginTime="0:0:0.25">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <CircleEase EasingMode="EaseIn"/>
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Button.Triggers>
+                                    </Button>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding IsPrimary}" Value="True">
                                             <Setter TargetName="Button" Property="Style" Value="{DynamicResource Button.Primary}"/>

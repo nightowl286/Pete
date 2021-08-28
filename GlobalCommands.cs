@@ -9,6 +9,8 @@ namespace Pete
     {
         #region Commands
         public static DelegateCommand ExitCommand { get; set; }
+        public static DelegateCommand<string> OpenUrlCommand { get; set; }
+        public static DelegateCommand<string> CopyTextToClipboardCommand { get; set; }
         #endregion
     }
 }

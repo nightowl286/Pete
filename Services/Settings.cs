@@ -16,8 +16,8 @@ namespace Pete.Services
     public class Settings : BindableBase, ISettings
     {
         #region Consts
-        private const int DEF_ITER = 2_500_000;
-        private const int DEF_SALT = 10240;
+        private const int DEF_ITER = ISettings.DEF_ITER;
+        private const int DEF_SALT = ISettings.DEF_SALT;
         private const string PATH_DATA = "data";
         private const string PATH_SETTINGS = PATH_DATA + "\\settings.bin";
         private const int FILTER_FIELDS= 12;
@@ -55,14 +55,9 @@ namespace Pete.Services
                 AdvancedBitReader r = new AdvancedBitReader();
                 r.FromArray(data);
 
-                Iterations = r.Read<int>();
-                SaltSize = r.Read<int>();
-
-
-                ReadFor(r, LogFilters, FILTER_FIELDS);
-                ReadFor(r, LogEntryFilters, FILTER_ENTRY_FIELDS);
-
-                ShowEntryListAtStart = r.ReadBool();
+                byte version = r.Read<byte>();
+                if (version == 0) LoadVersion0(r);
+                
             }
             else
                 SetDefaultFilters();
@@ -79,6 +74,8 @@ namespace Pete.Services
             byte[] data;
             using (AdvancedBitWriter w = new AdvancedBitWriter())
             {
+                w.Write<byte>(0); // settings version
+
                 w.Write(Iterations);
                 w.Write(SaltSize);
 
@@ -106,6 +103,20 @@ namespace Pete.Services
         {
             LogFilters = new ObservableCollection<bool>(Enumerable.Repeat(true, FILTER_FIELDS));
             LogEntryFilters = new ObservableCollection<bool>(Enumerable.Repeat(true, FILTER_ENTRY_FIELDS));
+        }
+        #endregion
+
+        #region Versioned loading and saving
+        private void LoadVersion0(AdvancedBitReader r)
+        {
+            Iterations = r.Read<int>();
+            SaltSize = r.Read<int>();
+
+
+            ReadFor(r, LogFilters, FILTER_FIELDS);
+            ReadFor(r, LogEntryFilters, FILTER_ENTRY_FIELDS);
+
+            ShowEntryListAtStart = r.ReadBool();
         }
         #endregion
 

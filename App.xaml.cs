@@ -31,6 +31,7 @@ namespace Pete
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
+
     public partial class App
     {
         #region Consts
@@ -39,6 +40,8 @@ namespace Pete
         public const int SLIDE_ANIMATION_INTERVAL_MINIMUM = 1; // requires at least 1 otherwise the text won't update and it will look like it froze
         public const double SLIDE_ANIMATION_INTERVAL_DECREMENT = 0.2;
         public const bool REPORT_BUGS = true;
+        public const string GITHUB_LINK = @"https://github.com/nightowl286";
+        public const string ENERGY_DRINKS = "36";
 #if DEBUG
         public const bool REQUIRE_ADMIN = true;
 #endif
@@ -50,12 +53,6 @@ namespace Pete
         #endregion
 
         #region Prism
-        public static void ThrowError<T>(out string msg,out T lol, int def = SLIDE_ANIMATION_INTERVAL)
-        {
-            throw new Exception("hope this works, guess we'll see.");
-            
-        }
-
         protected override Window CreateShell()
         {
             _BugReporter = Container.Resolve<IBugReporter>();
@@ -80,6 +77,7 @@ namespace Pete
             containerRegistry.RegisterForNavigation<EntryList>();
             containerRegistry.RegisterForNavigation<Views.ActivityLog>();
             containerRegistry.RegisterForNavigation<RequireAdmin>();
+            containerRegistry.RegisterForNavigation<Views.Settings>();
 
             containerRegistry.RegisterDialogWindow<GeneralDialogWindow>(nameof(GeneralDialogWindow));
             containerRegistry.RegisterDialog<ConfirmRemoveDialog>();
@@ -89,7 +87,7 @@ namespace Pete
 
             containerRegistry.RegisterSingleton<IEncryptionModule, EncryptionModule>();
             containerRegistry.RegisterSingleton<ICategoryStore, CategoryStore>();
-            containerRegistry.RegisterSingleton<ISettings, Settings>();
+            containerRegistry.RegisterSingleton<ISettings, Services.Settings>();
             containerRegistry.RegisterSingleton<IEntryStore, EntryStore>();
             containerRegistry.RegisterSingleton<IBugReporter, BugReporter>();
             containerRegistry.RegisterSingleton<IActivityLog, Services.ActivityLog>();
@@ -136,6 +134,8 @@ namespace Pete
         private void MakeGlobalCommands()
         {
             GlobalCommands.ExitCommand = new DelegateCommand(App.Current.Shutdown);
+            GlobalCommands.OpenUrlCommand = new DelegateCommand<string>(OpenUrl);
+            GlobalCommands.CopyTextToClipboardCommand = new DelegateCommand<string>(CopyToClipboard);
         }
         private void ReloadImages()
         {
@@ -168,10 +168,17 @@ namespace Pete
         #endregion
 
         #region Functions
+        public static void CopyToClipboard(string text)
+        {
+            Clipboard.SetText(text);
+            Clipboard.Flush();
+        }
         private static bool IsAdmin()
         {
 #if DEBUG
+#pragma warning disable CS0162 // Unreachable code detected
             if (!REQUIRE_ADMIN) return true;
+#pragma warning restore CS0162 // Unreachable code detected
 #endif
 
             try

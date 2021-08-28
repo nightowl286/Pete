@@ -13,6 +13,7 @@ using Prism.Regions;
 using Pete.Views;
 using Pete.Views.Registration;
 using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace Pete.ViewModels.Registration
 {
@@ -122,6 +123,7 @@ namespace Pete.ViewModels.Registration
                 _EncryptionModule.Device2FA = _DetectedUsb;
             }
 
+
             App.InitialiseE2FA();
 
             if (!_EncryptionModule.HasFAKey)
@@ -143,7 +145,7 @@ namespace Pete.ViewModels.Registration
                 Debug.WriteLine($"[Registration] key successfully stored on 2fa device.");
 
                 _ActivityLog.LoadEncrypted();
-                _ActivityLog.Log(Models.Logs.LogType.Register);
+                _ActivityLog.AddFirstRegistration();
 
                 _Dispatcher.Invoke(() => _RegionManager.RequestNavigate(RegionNames.MainRegion, nameof(Dashboard), App.DebugNavigationCallback));
             }

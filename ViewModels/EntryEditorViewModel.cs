@@ -157,7 +157,7 @@ namespace Pete.ViewModels
             {
                 _DialogService.Message(CancelEditResult, "cancel edit?",
                     "are you sure you want to cancel your edit? any changes will be reverted.", ButtonResult.No,
-                    new ButtonInfo(ButtonType.Normal, "cancel edit", ButtonResult.Yes), keepEditing);
+                    keepEditing, new ButtonInfo(ButtonType.Normal, "cancel edit", ButtonResult.Yes));
             }
             else if (string.IsNullOrWhiteSpace(Title) && string.IsNullOrWhiteSpace(Data))
             {
@@ -167,7 +167,7 @@ namespace Pete.ViewModels
             else
                 _DialogService.Message(CancelEditResult, "remove new entry?",
                     "are you sure you want to cancel editing this new entry? this will also remove it.", ButtonResult.No,
-                    new ButtonInfo(ButtonType.Normal, "remove entry", ButtonResult.Yes), keepEditing);
+                    keepEditing, new ButtonInfo(ButtonType.Normal, "remove entry", ButtonResult.Yes));
         }
         private void CancelEditResult(ButtonResult result)
         {
@@ -208,6 +208,7 @@ namespace Pete.ViewModels
                 _ReservedToken = null;
                 CanDelete = true;
                 CreateDate = _ActivityLog.Log(_EntryId.Value, EntryLogType.Create);
+                _ActivityLog.Log(_EntryId.Value, EntryLogType.View);
             }
             IsInEditMode = false;
 

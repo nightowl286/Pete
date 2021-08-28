@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pete", "Pete.csproj", "{D31
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FCB5AE75-4F89-4C02-AF1E-C8D44A60A390}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		notes.txt = notes.txt
 	EndProjectSection
 EndProject

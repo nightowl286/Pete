@@ -13,7 +13,7 @@ namespace Pete.Other
         private class QueueItem : IDisposable
         {
             #region Fields
-            private Func<CancellationToken, Task> _Action;
+            private readonly Func<CancellationToken, Task> _Action;
             public CancellationTokenSource _Cancellation;
             public Task _Task;
             public CancellationToken Token => _Cancellation.Token;
@@ -39,7 +39,7 @@ namespace Pete.Other
             {
                 if (_Task?.IsCompleted == false && _Cancellation?.IsCancellationRequested == false)
                 {
-                    Debug.WriteLine($"QueueItemCancelled");
+                   //Debug.WriteLine($"QueueItemCancelled");
                     _Cancellation.Cancel();
                     Cancelled = true;
                 }
@@ -56,7 +56,7 @@ namespace Pete.Other
         }
         private struct OwnershipToken : IDisposable
         {
-            private ThreadedQueue _Queue;
+            private readonly ThreadedQueue _Queue;
             public OwnershipToken(ThreadedQueue queue)
             {
                 _Queue = queue;
@@ -68,7 +68,7 @@ namespace Pete.Other
         #endregion
 
         #region Private
-        private List<QueueItem> _Scheduled;
+        private readonly List<QueueItem> _Scheduled;
         private const int HAS_OWNERSHIP = 1;
         private const int NO_OWNERSHIP = 0;
         private int _Ownership;
@@ -77,7 +77,7 @@ namespace Pete.Other
         public ThreadedQueue()
         {
             _Scheduled = new List<QueueItem>();
-            Log("ctor");
+            //Log("ctor");
         }
 
         #region Methods
@@ -105,7 +105,7 @@ namespace Pete.Other
         private async Task TaskAction()
         {
             Debug.WriteLine("");
-            Log("TaskAction entry");
+            //Log("TaskAction entry");
             while (true)
             {
                 await SlowMutexWait();
@@ -117,13 +117,13 @@ namespace Pete.Other
                     try
                     {
                         Task task = item.PrepareTask();
-                        Log($"awaiting scheduled task | token {item._Cancellation.GetHashCode():x2}");
+                        //Log($"awaiting scheduled task | token {item._Cancellation.GetHashCode():x2}");
                         await task;
-                        Log($"scheduled task finished ({task.Status})");
+                        //Log($"scheduled task finished ({task.Status})");
                     }
                     catch (Exception ex)
                     {
-                        Log($"scheduled task cancelled {ex.Message}");
+                        //Log($"scheduled task cancelled {ex.Message}");
                     }
 
                     await SlowMutexWait();
@@ -136,7 +136,7 @@ namespace Pete.Other
                 else
                 {
                     ReleaseOwnership();
-                    Log("TaskAction leave");
+                    //Log("TaskAction leave");
                     return;
                 }
 
@@ -164,11 +164,11 @@ namespace Pete.Other
         private void ScheduleCore(Func<CancellationToken, Task> action)
         {
             _Scheduled.Add(new QueueItem(action));
-            Log($"scheduled new action. count: {_Scheduled.Count:n0}");
+            //Log($"scheduled new action. count: {_Scheduled.Count:n0}");
 
             if (_WorkTask?.IsCompleted != false)
             {
-                Log("starting work task");
+                //Log("starting work task");
                 _WorkTask = TaskAction();
                 _WorkTask.ConfigureAwait(false);
 
@@ -176,7 +176,7 @@ namespace Pete.Other
         }
         private void CancelAllCore()
         {
-            Log($"Cancelling {_Scheduled.Count} task/s");
+            //Log($"Cancelling {_Scheduled.Count} task/s");
             foreach(QueueItem item in _Scheduled)
                 item.Cancel();
         }

@@ -21,4 +21,7 @@
     <sys:String x:Key="Text.Arrow.Left"></sys:String>
     <sys:String x:Key="Text.ArrowHead.Down"></sys:String>
     <sys:String x:Key="Text.Dash"></sys:String>
+    <sys:String x:Key="Text.StatusCircle.Outer"></sys:String>
+    <sys:String x:Key="Text.StatusCircle.Question"></sys:String>
+    <sys:String x:Key="Text.Broom"></sys:String>
 </ResourceDictionary>

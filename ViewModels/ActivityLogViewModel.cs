@@ -210,7 +210,7 @@ namespace Pete.ViewModels
                 else if (log.Type == LogType.Login & login)
                     toAdd = new BaseLogViewModel(log.Date, "authorised login");
                 else if (log.Type == LogType.Register & register)
-                    toAdd = new BaseLogViewModel(log.Date, logNum == 1 ? "first registration" : "late registration");
+                    toAdd = new BaseLogViewModel(log.Date, logNum == _AllLogCount ? "first registration" : "late registration");
                 else if (log.Type == LogType.FailedLogin & failedLogin)
                     toAdd = new BaseDangerousLogViewModel(log.Date, "failed login");
                 else if (log.Type == LogType.WarningsSeen & warningsSeen)

@@ -16,27 +16,17 @@ namespace Pete.Services
         private const string PATH_BUGS = "bug reports";
         #endregion
 
-        #region Private
-        private readonly IDialogService _DialogService;
-        #endregion
-        public BugReporter(IDialogService dialogService)
-        {
-            _DialogService = dialogService;
-        }
-
         #region Methods
         private string SaveReport(Exception ex, Dictionary<string, string> otherData)
         {
             DateTime date = DateTime.UtcNow;
-            string fileNameBase = $"Pete {date:dd-MM-yyyy HH:mm:ss}";
+            string fileNameBase = $"Pete {date:dd-MM-yyyy HH-mm-ss}";
             if (!Directory.Exists(PATH_BUGS)) Directory.CreateDirectory(PATH_BUGS);
 
             string fileName = Path.Combine(PATH_BUGS, fileNameBase + ".txt");
             int counter = 1;
             while (File.Exists(fileName))
                 fileName = Path.Combine(PATH_BUGS, $"{fileNameBase} ({++counter}).txt");
-
-
 
             using (StreamWriter sw = new StreamWriter(fileName, false, Encoding.UTF8))
             {
@@ -95,8 +85,6 @@ namespace Pete.Services
                 sw.WriteLine($"\n -- Stack Trace --");
                 sw.WriteLine(ex.StackTrace);
                 #endregion
-
-
             }
 
             return fileName;

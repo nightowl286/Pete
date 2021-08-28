@@ -52,6 +52,7 @@ namespace Pete.Models
         }
         public ButtonInfo(object content, object parameter) : this(ButtonType.Normal, content, parameter) { }
         public ButtonInfo(object content) : this(content, content) { }
+        public ButtonInfo(ButtonType type, string content, ButtonResult parameter) : this(type, content as object, parameter) { }
 
     }
 }
